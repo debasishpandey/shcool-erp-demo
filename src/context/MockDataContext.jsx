@@ -6,27 +6,20 @@ const MockDataContext = createContext();
 export const useMockData = () => useContext(MockDataContext);
 
 export const MockDataProvider = ({ children }) => {
+  const DEMO_DATA_VERSION = 'v4';
+  const STORAGE_KEY = `schoolERPDemoData_${DEMO_DATA_VERSION}`;
+
   // Try to load from localStorage first
   const loadInitialState = () => {
-    const saved = localStorage.getItem('schoolERPDemoData');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse local storage data", e);
-      }
-    }
-    
-    // Fallback to initial mock data
-    return {
-      students: initialMockData.students,
-      teachers: initialMockData.teachers,
-      classes: initialMockData.classes,
-      feeTransactions: initialMockData.feeTransactions,
-      exams: initialMockData.exams,
-      notices: initialMockData.notices,
-      expenses: initialMockData.expenses,
-      dashboardStats: initialMockData.dashboardStats,
+    const defaultState = {
+      students: initialMockData.students || [],
+      teachers: initialMockData.teachers || [],
+      classes: initialMockData.classes || [],
+      feeTransactions: initialMockData.feeTransactions || [],
+      exams: initialMockData.exams || [],
+      notices: initialMockData.notices || [],
+      expenses: initialMockData.expenses || [],
+      dashboardStats: initialMockData.dashboardStats || {},
       admissions: [
         { id: "ENQ-001", studentName: "Rohan Khanna", parentName: "Vivek Khanna", phone: "9876543111", appliedClass: "Class X", date: "2026-08-20", status: "New" },
         { id: "ENQ-002", studentName: "Sara Ali", parentName: "Ahmed Ali", phone: "9876543222", appliedClass: "Class VIII", date: "2026-08-21", status: "Application" },
@@ -41,18 +34,44 @@ export const MockDataProvider = ({ children }) => {
       ],
       documents: []
     };
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const savedData = JSON.parse(saved);
+        return {
+          ...defaultState,
+          ...savedData,
+          students: Array.isArray(savedData.students) ? savedData.students : defaultState.students,
+          teachers: Array.isArray(savedData.teachers) ? savedData.teachers : defaultState.teachers,
+          classes: Array.isArray(savedData.classes) ? savedData.classes : defaultState.classes,
+          feeTransactions: Array.isArray(savedData.feeTransactions) ? savedData.feeTransactions : defaultState.feeTransactions,
+          exams: Array.isArray(savedData.exams) ? savedData.exams : defaultState.exams,
+          notices: Array.isArray(savedData.notices) ? savedData.notices : defaultState.notices,
+          expenses: Array.isArray(savedData.expenses) ? savedData.expenses : defaultState.expenses,
+          admissions: Array.isArray(savedData.admissions) ? savedData.admissions : defaultState.admissions,
+          homework: Array.isArray(savedData.homework) ? savedData.homework : defaultState.homework,
+          activities: Array.isArray(savedData.activities) ? savedData.activities : defaultState.activities,
+          documents: Array.isArray(savedData.documents) ? savedData.documents : defaultState.documents,
+        };
+      } catch (e) {
+        console.error("Failed to parse local storage data", e);
+      }
+    }
+    
+    return defaultState;
   };
 
   const [data, setData] = useState(loadInitialState);
 
   // Persist to local storage on every change
   useEffect(() => {
-    localStorage.setItem('schoolERPDemoData', JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }, [data]);
 
   // Actions
   const resetDemoData = () => {
-    localStorage.removeItem('schoolERPDemoData');
+    localStorage.removeItem(STORAGE_KEY);
     setData(loadInitialState());
   };
 

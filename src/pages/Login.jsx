@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, User, Shield, Briefcase, GraduationCap, MonitorSmartphone } from 'lucide-react';
+import { BookOpen, User, Shield, Briefcase, GraduationCap, MonitorSmartphone, Calculator } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
