@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMockData } from '../context/MockDataContext';
-import { Search, Filter, Plus, FileText, BarChart2, MessageSquare, Printer, Eye, X } from 'lucide-react';
+import { CheckCircle2, CreditCard, Eye, MessageSquare, Plus, Printer, Search, X, Filter } from 'lucide-react';
 
 export default function Accounts() {
   const { data, recordFeePayment, sendFeeReminder } = useMockData();
@@ -13,6 +13,7 @@ export default function Accounts() {
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [showClassDetailModal, setShowClassDetailModal] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
