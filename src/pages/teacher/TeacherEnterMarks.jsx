@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle2, ChevronDown } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ChevronDown, Edit3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { latestExam, teachingCombinations, examResultsVIII_A } from '../../data/teacherMockData';
 
@@ -20,7 +20,7 @@ export default function TeacherEnterMarks() {
     const initialMarks = {};
     examResultsVIII_A.forEach(student => {
       // Just use the Mathematics/Science marks as a realistic base for the demo
-      initialMarks[student.id || student.rollNo] = student.marks[combo.subject] || '';
+      initialMarks[student.rollNo] = student.marks?.[combo.subject] ?? '';
     });
     setMarksState(initialMarks);
   };
