@@ -79,3 +79,45 @@ export const initialConcerns = [
   { id: 1, student: 'Aarav Sharma', type: 'Homework', message: 'Homework has not been submitted for the last 3 assignments.', status: 'Open', date: '26 Aug 2026', parentNotified: true },
   { id: 2, student: 'Ishaan Verma', type: 'Attendance', message: 'Frequently absent in the first period.', status: 'Resolved', date: '15 Aug 2026', parentNotified: true }
 ];
+
+// Helper to generate a stable mock matrix
+const generateMonthlyMatrix = () => {
+  const dates = [];
+  for(let i=1; i<=31; i++) {
+    const d = new Date(2026, 7, i); // August 2026
+    const day = d.toLocaleDateString('en-US', { weekday: 'short' });
+    dates.push({ date: i.toString().padStart(2, '0'), day, isWeekend: d.getDay() === 0 || d.getDay() === 6 });
+  }
+  
+  // Use a predictable pseudo-random approach based on roll number so it doesn't change on re-render
+  const matrix = studentsVIII_A.map((s, idx) => {
+    const statuses = [];
+    let presentCount = 0;
+    let absentCount = 0;
+    let lateCount = 0;
+    
+    for(let i=1; i<=31; i++) {
+       const isWeekend = dates[i-1].isWeekend;
+       if (isWeekend) {
+         statuses.push('-');
+         continue;
+       }
+       
+       // Deterministic logic
+       let st = 'P';
+       if ((i + idx) % 15 === 0) st = 'A';
+       else if ((i + idx) % 11 === 0) st = 'L';
+       
+       statuses.push(st);
+       if(st==='P') presentCount++;
+       if(st==='A') absentCount++;
+       if(st==='L') lateCount++;
+    }
+    const percentage = Math.round((presentCount / (presentCount + absentCount + lateCount)) * 100) || 100;
+    return { ...s, statuses, presentCount, absentCount, lateCount, percentage };
+  });
+
+  return { dates, matrix };
+};
+
+export const monthlyAttendanceData = generateMonthlyMatrix();

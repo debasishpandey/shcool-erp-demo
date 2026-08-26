@@ -10,7 +10,10 @@ export default function TeacherLayout() {
         <TeacherHeader />
         
         {/* Main Content Area - padded at bottom for the fixed nav */}
-        <main className="flex-1 overflow-y-auto pb-20 bg-gray-50">
+        <main 
+          className="flex-1 overflow-y-auto bg-gray-50 pb-24"
+          style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+        >
           <Outlet />
         </main>
         

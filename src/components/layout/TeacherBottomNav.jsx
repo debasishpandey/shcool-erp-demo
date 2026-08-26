@@ -11,7 +11,13 @@ export default function TeacherBottomNav() {
   ];
 
   return (
-    <nav className="absolute bottom-0 w-full bg-white border-t border-gray-200 pb-safe z-50 px-2 sm:px-4 flex justify-between items-center h-16 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <nav 
+      className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-200 z-[999] px-2 sm:px-4 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
+      style={{ 
+        height: 'calc(4rem + env(safe-area-inset-bottom))', 
+        paddingBottom: 'env(safe-area-inset-bottom)' 
+      }}
+    >
       {navItems.map((item) => (
         <NavLink
           key={item.name}

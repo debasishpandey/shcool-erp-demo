@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, Plus, X, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { myAssignments, allSubjectHomeworkVIII_A, teachingCombinations, teacherProfile } from '../../data/teacherMockData';
+import TeacherHomeworkDetail from './TeacherHomeworkDetail';
 
 export default function TeacherHomework() {
   const [assignments, setAssignments] = useState(myAssignments);
@@ -11,6 +12,9 @@ export default function TeacherHomework() {
   const [selectedCombo, setSelectedCombo] = useState('');
   const [title, setTitle] = useState('');
   const [isSaved, setIsSaved] = useState(false);
+  
+  // Detail View State
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -38,6 +42,16 @@ export default function TeacherHomework() {
     }, 2000);
   };
 
+  if (selectedAssignment) {
+    return (
+      <TeacherHomeworkDetail 
+        assignment={selectedAssignment} 
+        onBack={() => setSelectedAssignment(null)} 
+        isClassTeacherView={viewClassTeacherMode}
+      />
+    );
+  }
+
   if (viewClassTeacherMode) {
     return (
       <div className="flex flex-col h-full bg-gray-50 pb-20 relative">
@@ -57,7 +71,11 @@ export default function TeacherHomework() {
           </div>
           
           {allSubjectHomeworkVIII_A.map((hw, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:bg-gray-50 transition-colors flex justify-between items-center">
+            <div 
+              key={idx} 
+              onClick={() => setSelectedAssignment({ ...hw, class: teacherProfile.classTeacherOf })}
+              className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:bg-gray-50 transition-colors flex justify-between items-center cursor-pointer"
+            >
               <div>
                 <h3 className="font-bold text-gray-900">{hw.subject}</h3>
                 <p className="text-sm text-gray-500">{hw.title}</p>
@@ -184,7 +202,11 @@ export default function TeacherHomework() {
           <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">My Assignments</h2>
           <div className="space-y-3">
             {assignments.map(hw => (
-              <div key={hw.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer">
+              <div 
+                key={hw.id} 
+                onClick={() => setSelectedAssignment(hw)}
+                className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center active:bg-gray-50 transition-colors cursor-pointer"
+              >
                 <div>
                   <div className="flex gap-2 items-center mb-1">
                     <span className="font-bold text-gray-900">{hw.class}</span>
