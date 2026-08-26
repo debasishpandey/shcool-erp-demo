@@ -33,7 +33,10 @@ export default function Login() {
             {roles.map((role) => (
               <div 
                 key={role.id}
-                onClick={() => navigate(role.path)}
+                onClick={() => {
+                  localStorage.setItem('demoUserRole', role.id);
+                  navigate(role.path);
+                }}
                 className="flex items-center p-4 border border-gray-200 rounded-xl hover:border-primary-500 hover:shadow-md cursor-pointer transition-all bg-white group"
               >
                 <div className={`p-4 rounded-lg ${role.color} group-hover:scale-110 transition-transform`}>

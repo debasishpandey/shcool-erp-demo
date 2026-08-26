@@ -64,6 +64,40 @@ const navGroups = [
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }) {
+  const role = localStorage.getItem('demoUserRole') || 'admin';
+
+  const roleFilteredNavGroups = navGroups.map(group => {
+    if (role === 'admin') return group;
+    
+    if (role === 'accountant') {
+      const allowedPaths = ['/dashboard', '/students', '/classes', '/accounts', '/expenses', '/reports', '/notices', '/settings'];
+      const filteredItems = group.items.filter(item => allowedPaths.includes(item.path));
+      if (filteredItems.length > 0) {
+        return { ...group, items: filteredItems };
+      }
+      return null;
+    }
+    return group;
+  }).filter(Boolean);
+
+  let profileName = "Admin";
+  let profileRole = "Administrator";
+  let profileInitial = "A";
+  
+  if (role === 'accountant') {
+    profileName = "Ravi Kumar";
+    profileRole = "Accounts & Finance";
+    profileInitial = "R";
+  } else if (role === 'teacher') {
+    profileName = "Teacher";
+    profileRole = "Faculty";
+    profileInitial = "T";
+  } else if (role === 'parent') {
+    profileName = "Parent";
+    profileRole = "Parent Portal";
+    profileInitial = "P";
+  }
+
   return (
     <div className={clsx(
       "flex flex-col w-64 bg-white border-r border-gray-200 h-screen fixed top-0 left-0 z-50 transition-transform duration-300 ease-in-out lg:translate-x-0",
@@ -85,7 +119,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       </div>
       <div className="flex-1 overflow-y-auto py-4 sidebar-scroll">
         <nav className="space-y-4 px-3">
-          {navGroups.map((group, idx) => (
+          {roleFilteredNavGroups.map((group, idx) => (
             <div key={idx}>
               <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
                 {group.title}
@@ -117,12 +151,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
-                A
+                {profileInitial}
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700">Admin</p>
-              <p className="text-xs font-medium text-gray-500">Administrator</p>
+              <p className="text-sm font-medium text-gray-700">{profileName}</p>
+              <p className="text-xs font-medium text-gray-500">{profileRole}</p>
             </div>
           </div>
           <Link to="/login" className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-md hover:bg-red-50 hidden lg:block" title="Logout">

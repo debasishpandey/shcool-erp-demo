@@ -157,6 +157,17 @@ export const MockDataProvider = ({ children }) => {
       };
     });
     addActivity(`₹${amount} fee payment recorded`);
+    // Return a locally constructed copy so the caller can use it immediately without waiting for React state to cycle
+    return {
+      receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`, // Just an approximation since state is async
+      student: "Student",
+      class: "Class",
+      amount: amount,
+      method: method,
+      feeType: remarks || "Tuition Fee",
+      date: new Date().toISOString().split('T')[0],
+      status: "Successful"
+    };
   };
 
   const markAttendance = (studentId, status) => {

@@ -1,10 +1,20 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
 export default function AppLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const role = localStorage.getItem('demoUserRole') || 'admin';
+
+  if (role === 'accountant') {
+    const allowedPaths = ['/dashboard', '/students', '/classes', '/accounts', '/expenses', '/reports', '/notices', '/settings'];
+    const isAllowed = allowedPaths.some(p => location.pathname.startsWith(p));
+    if (!isAllowed) {
+      return <Navigate to="/accounts" replace />;
+    }
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
