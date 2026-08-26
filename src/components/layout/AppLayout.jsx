@@ -9,7 +9,7 @@ export default function AppLayout() {
   const role = localStorage.getItem('demoUserRole') || 'admin';
 
   if (role === 'accountant') {
-    const allowedPaths = ['/dashboard', '/students', '/classes', '/accountant', '/accounts', '/expenses', '/reports', '/notices', '/settings'];
+    const allowedPaths = ['/dashboard', '/students', '/classes', '/accountant', '/accounts', '/expenses', '/reports', '/notices', '/settings', '/record-payment'];
     const isAllowed = allowedPaths.some(p => location.pathname.startsWith(p));
     if (!isAllowed) {
       return <Navigate to="/accounts" replace />;

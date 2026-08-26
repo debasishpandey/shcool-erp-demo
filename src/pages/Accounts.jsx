@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMockData } from '../context/MockDataContext';
-import { CreditCard, Search, Filter, Plus, FileText, CheckCircle2, AlertCircle, BarChart2, MessageSquare, Printer, Eye, X } from 'lucide-react';
+import { Search, Filter, Plus, FileText, BarChart2, MessageSquare, Printer, Eye, X } from 'lucide-react';
 
 export default function Accounts() {
   const { data, recordFeePayment, sendFeeReminder } = useMockData();
@@ -10,7 +10,6 @@ export default function Accounts() {
   const [activeTab, setActiveTab] = useState('overview'); // overview, collections, dues, receipts
 
   // Modal States
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [showClassDetailModal, setShowClassDetailModal] = useState(false);
