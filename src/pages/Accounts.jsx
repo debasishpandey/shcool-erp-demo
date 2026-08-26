@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMockData } from '../context/MockDataContext';
 import { CreditCard, Search, Filter, Plus, FileText, CheckCircle2, AlertCircle, BarChart2, MessageSquare, Printer, Eye, X } from 'lucide-react';
 
@@ -27,17 +28,7 @@ export default function Accounts() {
   const [feeStatusFilter, setFeeStatusFilter] = useState('All Fee Statuses');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [payStudentId, setPayStudentId] = useState('');
-  const [payAmount, setPayAmount] = useState('');
-  const [payMethod, setPayMethod] = useState('UPI');
-  const [payFeeType, setPayFeeType] = useState('Tuition Fee');
-  const [paymentRemarks, setPaymentRemarks] = useState('');
-  const [paymentError, setPaymentError] = useState('');
-  const [paymentSuccessData, setPaymentSuccessData] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
-
-  const selectedPayStudent = students.find(s => s.id.toString() === payStudentId.toString());
+  const navigate = useNavigate();
 
   // Reminder Form State
   const [reminderMethod, setReminderMethod] = useState('Both');
@@ -72,55 +63,6 @@ export default function Accounts() {
     return txn.receiptNo.toLowerCase().includes(searchQuery.toLowerCase()) || 
            txn.student.toLowerCase().includes(searchQuery.toLowerCase());
   });
-
-  const handlePaymentSubmit = (e) => {
-    e.preventDefault();
-    if (!selectedPayStudent || isSubmitting) return;
-    
-    setIsSubmitting(true);
-    const amt = parseInt(payAmount);
-    if (isNaN(amt) || amt <= 0) {
-      setPaymentError("Please enter a valid amount greater than 0.");
-      setIsSubmitting(false);
-      return;
-    }
-    
-    if (amt > selectedPayStudent.pendingFee) {
-      setPaymentError(`Payment cannot exceed current due of ₹${selectedPayStudent.pendingFee.toLocaleString()}.`);
-      setIsSubmitting(false);
-      return;
-    }
-
-    setPaymentError('');
-    const exactTxn = recordFeePayment(selectedPayStudent.id, amt, payMethod, payFeeType, paymentRemarks);
-    
-    if (exactTxn) {
-      setPaymentSuccessData(exactTxn);
-    } else {
-      setPaymentError("Failed to record payment. Please try again.");
-    }
-    setIsSubmitting(false);
-  };
-
-  const openPaymentModal = (student) => {
-    setPayStudentId(student ? student.id.toString() : '');
-    setPayAmount(student && student.pendingFee > 0 ? student.pendingFee.toString() : '');
-    setPayMethod('UPI');
-    setPayFeeType('Tuition Fee');
-    setPaymentRemarks('');
-    setPaymentError('');
-    setPaymentSuccessData(null);
-    setIsSubmitting(false);
-    setShowPaymentModal(true);
-  };
-
-  useEffect(() => {
-    // When student changes, reset error and auto-fill amount if pendingFee > 0
-    setPaymentError('');
-    if (selectedPayStudent && !paymentSuccessData) {
-      setPayAmount(selectedPayStudent.pendingFee > 0 ? selectedPayStudent.pendingFee.toString() : '');
-    }
-  }, [payStudentId, selectedPayStudent, paymentSuccessData]);
 
   const handleSendReminder = () => {
     sendFeeReminder(selectedStudent.name, selectedStudent.pendingFee);
@@ -195,7 +137,7 @@ export default function Accounts() {
           </div>
           <div className="mt-4 sm:mt-0 flex gap-3">
             <button 
-              onClick={() => openPaymentModal(null)}
+              onClick={() => navigate('/accountant/record-payment')}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -495,7 +437,7 @@ export default function Accounts() {
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex items-center justify-center gap-2">
                               <button 
-                                onClick={() => openPaymentModal(student)}
+                                onClick={() => navigate('/accountant/record-payment?studentId=' + student.id)}
                                 className="text-primary-600 hover:text-primary-900 px-2 py-1 border border-primary-200 rounded-md hover:bg-primary-50"
                                 title="Record Payment"
                               >
@@ -580,196 +522,7 @@ export default function Accounts() {
           </div>
         </div>
 
-        {/* RECORD PAYMENT MODAL */}
-        {showPaymentModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowPaymentModal(false)}></div>
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                {paymentSuccessData ? (
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 text-center">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                      <CheckCircle2 className="h-6 w-6 text-green-600" />
-                    </div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Payment Recorded Successfully</h3>
-                    <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-left mb-6 space-y-2">
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-gray-500">Receipt No:</span>
-                        <span className="font-semibold text-gray-900">{paymentSuccessData.receiptNo}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-gray-500">Student:</span>
-                        <span className="font-semibold text-gray-900">{paymentSuccessData.student}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-gray-500">Class:</span>
-                        <span className="font-semibold text-gray-900">{paymentSuccessData.class}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-gray-500">Previous Due:</span>
-                        <span className="font-semibold text-gray-900">₹{paymentSuccessData.previousDue.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-gray-500">Amount Paid:</span>
-                        <span className="font-bold text-green-600">₹{paymentSuccessData.amount.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-gray-500">Payment:</span>
-                        <span className="font-semibold text-gray-900">{paymentSuccessData.method}</span>
-                      </div>
-                      <div className="flex justify-between pt-1">
-                        <span className="text-gray-500">Remaining Due:</span>
-                        <span className="font-bold text-red-600">₹{paymentSuccessData.remainingDue.toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <button 
-                        onClick={() => { setShowPaymentModal(false); openReceiptModal(paymentSuccessData); }}
-                        className="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm"
-                      >
-                        <Eye className="mr-2 h-4 w-4" /> View Receipt
-                      </button>
-                      <button 
-                        onClick={() => { setShowPaymentModal(false); handlePrintReceipt(paymentSuccessData); }}
-                        className="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:text-sm"
-                      >
-                        <Printer className="mr-2 h-4 w-4" /> Print Receipt
-                      </button>
-                      <button 
-                        onClick={() => setShowPaymentModal(false)}
-                        className="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm"
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <form onSubmit={handlePaymentSubmit}>
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                      <div className="sm:flex sm:items-start">
-                        <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 sm:mx-0 sm:h-10 sm:w-10">
-                          <CreditCard className="h-6 w-6 text-primary-600" />
-                        </div>
-                        <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                          <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">Record Payment</h3>
-                          <div className="mt-4 space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
-                              <select 
-                                required
-                                value={payStudentId}
-                                onChange={(e) => setPayStudentId(e.target.value)}
-                                className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                              >
-                                <option value="">Select a student...</option>
-                                {students.map(s => (
-                                  <option key={s.id} value={s.id}>{s.name} — Class {s.class}-{s.section} — {s.admissionNo}</option>
-                                ))}
-                              </select>
-                              {selectedPayStudent && (
-                                <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded border border-gray-100 flex flex-col gap-1">
-                                  <div className="flex justify-between">
-                                    <span>Total Fee:</span>
-                                    <span>₹{selectedPayStudent.totalFee.toLocaleString()}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Paid:</span>
-                                    <span className="text-green-600 font-medium">₹{selectedPayStudent.paidFee.toLocaleString()}</span>
-                                  </div>
-                                  <div className="flex justify-between font-bold border-t pt-1 mt-1 border-gray-200">
-                                    <span className="text-gray-900">Current Due:</span>
-                                    <span className="text-red-600">₹{selectedPayStudent.pendingFee.toLocaleString()}</span>
-                                  </div>
-                                  {selectedPayStudent.pendingFee === 0 && (
-                                    <div className="mt-2 bg-green-100 text-green-800 text-xs font-bold p-2 rounded text-center">
-                                      No outstanding balance
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700">Fee Type</label>
-                                <select 
-                                  value={payFeeType}
-                                  onChange={(e) => setPayFeeType(e.target.value)}
-                                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                >
-                                  <option>Tuition Fee</option>
-                                  <option>Transport Fee</option>
-                                  <option>Exam Fee</option>
-                                  <option>Activity Fee</option>
-                                  <option>Annual Fee</option>
-                                </select>
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700">Amount Paid (₹)</label>
-                                <input 
-                                  required
-                                  type="number" 
-                                  value={payAmount}
-                                  onChange={(e) => setPayAmount(e.target.value)}
-                                  disabled={selectedPayStudent && selectedPayStudent.pendingFee === 0}
-                                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm disabled:bg-gray-100" 
-                                  placeholder="0" 
-                                />
-                              </div>
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">Payment Mode</label>
-                              <select 
-                                value={payMethod}
-                                onChange={(e) => setPayMethod(e.target.value)}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                              >
-                                <option>Cash</option>
-                                <option>UPI</option>
-                                <option>Bank Transfer</option>
-                                <option>Card</option>
-                                <option>Cheque</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">Remarks</label>
-                              <input 
-                                type="text" 
-                                value={paymentRemarks}
-                                onChange={(e) => setPaymentRemarks(e.target.value)}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                placeholder="Optional reference no or note"
-                              />
-                            </div>
-                            
-                            {paymentError && (
-                              <div className="text-sm text-red-600 bg-red-50 p-2 rounded flex gap-2 items-center">
-                                <AlertCircle className="w-4 h-4" />
-                                {paymentError}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                      <button 
-                        type="submit" 
-                        disabled={isSubmitting || (selectedPayStudent && selectedPayStudent.pendingFee === 0)}
-                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-                      >
-                        {isSubmitting ? 'Recording...' : 'Confirm Payment'}
-                      </button>
-                      <button type="button" onClick={() => setShowPaymentModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* SEND REMINDER MODAL */}
         {showReminderModal && selectedStudent && (
@@ -879,7 +632,7 @@ export default function Accounts() {
                             </td>
                             <td className="px-6 py-3 whitespace-nowrap text-center text-sm font-medium">
                               {student.pendingFee > 0 ? (
-                                <button onClick={() => { setShowClassDetailModal(false); openPaymentModal(student); }} className="text-primary-600 hover:text-primary-900 text-xs border border-primary-200 rounded px-2 py-1">Record Payment</button>
+                                <button onClick={() => navigate('/accountant/record-payment?studentId=' + student.id)} className="text-primary-600 hover:text-primary-900 text-xs border border-primary-200 rounded px-2 py-1">Record Payment</button>
                               ) : (
                                 <span className="text-gray-400 text-xs">Cleared</span>
                               )}

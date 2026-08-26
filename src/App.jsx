@@ -22,6 +22,7 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Homework from './pages/Homework';
 import Documents from './pages/Documents';
+import RecordPayment from './pages/RecordPayment';
 import ParentDashboard from './pages/parent/ParentDashboard';
 import ParentAcademics from './pages/parent/ParentAcademics';
 import ParentReportCard from './pages/parent/ParentReportCard';
@@ -69,6 +70,8 @@ function App() {
           <Route path="/homework" element={<Homework />} />
           <Route path="/accounts" element={<Accounts />} />
           <Route path="/accountant" element={<Accounts />} />
+          <Route path="/accountant/record-payment" element={<RecordPayment />} />
+          <Route path="/record-payment" element={<RecordPayment />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/exams" element={<Examinations />} />
           <Route path="/results" element={<Results />} />
