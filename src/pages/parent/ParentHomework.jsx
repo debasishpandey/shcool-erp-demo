@@ -94,13 +94,16 @@ export default function ParentHomework() {
 
       {/* Homework Detail Sheet */}
       {selectedHomework && (
-        <div className="fixed inset-0 bg-gray-900/60 z-50 flex items-end justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-3xl pt-2 pb-safe shadow-2xl flex flex-col">
-            <div className="flex justify-center mb-4">
+        <div 
+          className="fixed inset-0 bg-gray-900/60 z-50 flex items-end justify-center"
+          style={{ paddingBottom: 'var(--app-bottom-space)' }}
+        >
+          <div className="bg-white w-full max-w-[480px] rounded-t-3xl pt-2 shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="flex justify-center mb-4 shrink-0">
               <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
             </div>
             
-            <div className="px-6 py-2 flex justify-between items-start mb-2">
+            <div className="px-6 py-2 flex justify-between items-start mb-2 shrink-0 border-b border-gray-100 pb-4">
               <div>
                 <p className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-1">{selectedHomework.subject}</p>
                 <h2 className="font-black text-gray-900 text-2xl leading-tight">{selectedHomework.title}</h2>
@@ -110,7 +113,7 @@ export default function ParentHomework() {
               </button>
             </div>
 
-            <div className="px-6 mb-6">
+            <div className="px-6 py-4 overflow-y-auto flex-1">
               <div className="flex gap-4 mb-6 pt-4 border-t border-gray-100">
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Status</p>
@@ -134,7 +137,8 @@ export default function ParentHomework() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-100">
+            {/* Sticky Action Footer */}
+            <div className="p-4 border-t border-gray-100 shrink-0 bg-white">
               {selectedHomework.status === 'Pending' ? (
                 <button 
                   onClick={handleMarkComplete}

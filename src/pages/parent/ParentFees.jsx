@@ -120,18 +120,21 @@ export default function ParentFees() {
 
       {/* Payment Sheet Overlay */}
       {isPaying && (
-        <div className="fixed inset-0 bg-gray-900/60 z-50 flex items-end justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-3xl pt-2 pb-safe shadow-2xl flex flex-col">
-            <div className="flex justify-center mb-4">
+        <div 
+          className="fixed inset-0 bg-gray-900/60 z-50 flex items-end justify-center"
+          style={{ paddingBottom: 'var(--app-bottom-space)' }}
+        >
+          <div className="bg-white w-full max-w-[480px] rounded-t-3xl pt-2 shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="flex justify-center mb-4 shrink-0">
               <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
             </div>
             
-            <div className="px-6 mb-6">
+            <div className="px-6 py-2 mb-2 shrink-0 border-b border-gray-100 pb-4">
               <h2 className="font-black text-gray-900 text-xl mb-1">Pay School Fee</h2>
               <p className="text-sm font-bold text-gray-500">Pending Amount: ₹{pendingAmount.toLocaleString('en-IN')}</p>
             </div>
 
-            <div className="px-6 space-y-3 mb-6">
+            <div className="px-6 py-4 overflow-y-auto flex-1 space-y-3">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Select Payment Method</p>
               
               <div className="border-2 border-primary-600 bg-primary-50 p-4 rounded-xl flex items-center justify-between cursor-pointer">
@@ -148,7 +151,7 @@ export default function ParentFees() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-100 flex gap-3">
+            <div className="p-4 border-t border-gray-100 flex gap-3 shrink-0 bg-white">
               <button 
                 onClick={() => setIsPaying(false)}
                 className="flex-1 py-4 font-black text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200"

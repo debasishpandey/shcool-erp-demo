@@ -221,8 +221,11 @@ export default function TeacherConcerns() {
 
       {/* Raise Concern Form */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-white z-40 flex flex-col max-w-[480px] mx-auto overflow-hidden">
-          <div className="px-4 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+        <div 
+          className="fixed inset-0 bg-white z-40 flex flex-col max-w-[480px] mx-auto overflow-hidden"
+          style={{ paddingBottom: 'var(--app-bottom-space)' }}
+        >
+          <div className="px-4 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 shrink-0">
             <div>
               <h2 className="font-black text-gray-900 text-lg">Raise Concern</h2>
               <p className="text-sm font-semibold text-primary-700">{teacherProfile.classTeacherOf}</p>
@@ -275,7 +278,7 @@ export default function TeacherConcerns() {
                 required
               ></textarea>
             </div>
-            <div className="pt-4 pb-20">
+            <div className="pt-4 pb-4 shrink-0 bg-white border-t border-gray-100 px-4">
               <button 
                 type="submit"
                 disabled={!student || !message}
@@ -290,8 +293,11 @@ export default function TeacherConcerns() {
 
       {/* Suggestion Detail Sheet */}
       {selectedSuggestion && (
-        <div className="fixed inset-0 bg-gray-900/40 z-50 flex items-end justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-3xl p-6 pb-safe shadow-2xl flex flex-col">
+        <div 
+          className="fixed inset-0 bg-gray-900/40 z-50 flex items-end justify-center"
+          style={{ paddingBottom: 'var(--app-bottom-space)' }}
+        >
+          <div className="bg-white w-full max-w-[480px] rounded-t-3xl p-6 shadow-2xl flex flex-col max-h-[85vh] overflow-y-auto">
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center border ${

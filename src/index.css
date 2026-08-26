@@ -11,6 +11,10 @@
   --color-primary-700: #1d4ed8;
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
+
+  /* Standardized Mobile Bottom Navigation Layout */
+  --app-bottom-nav-height: 72px; /* Fixed height for the navigation bar */
+  --app-bottom-space: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom)); /* Total space consumed */
 }
 
 @layer utilities {

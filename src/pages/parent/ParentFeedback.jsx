@@ -88,21 +88,24 @@ export default function ParentFeedback() {
 
       {/* Create Modal */}
       {isCreating && (
-        <div className="fixed inset-0 bg-gray-900/60 z-50 flex items-end justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-3xl pt-2 pb-safe shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="flex justify-center mb-2">
+        <div 
+          className="fixed inset-0 bg-gray-900/60 z-50 flex items-end justify-center"
+          style={{ paddingBottom: 'var(--app-bottom-space)' }}
+        >
+          <div className="bg-white w-full max-w-[480px] rounded-t-3xl pt-2 shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="flex justify-center mb-2 shrink-0">
               <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
             </div>
             
-            <div className="px-6 py-2 flex justify-between items-center mb-4">
+            <div className="px-6 py-2 flex justify-between items-center mb-2 shrink-0 border-b border-gray-100 pb-4">
               <h2 className="font-black text-gray-900 text-xl">New Suggestion</h2>
               <button onClick={() => setIsCreating(false)} className="p-2 bg-gray-100 rounded-full text-gray-600 shrink-0">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="overflow-y-auto px-6 pb-6">
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="overflow-y-auto px-6 py-4 flex-1">
+              <form id="suggestion-form" onSubmit={handleSubmit} className="space-y-5">
                 
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Category</label>
@@ -145,16 +148,18 @@ export default function ParentFeedback() {
                     <p className="text-xs text-gray-500">Your name will not be visible to teachers.</p>
                   </div>
                 </div>
-
-                <div className="pt-2">
-                  <button 
-                    type="submit"
-                    className="w-full bg-primary-600 text-white font-black text-lg py-4 rounded-xl shadow-sm hover:bg-primary-700 active:scale-[0.98] transition-all"
-                  >
-                    Submit Suggestion
-                  </button>
-                </div>
               </form>
+            </div>
+
+            {/* Sticky Action Footer inside Modal */}
+            <div className="px-6 py-4 border-t border-gray-100 bg-white shrink-0">
+              <button 
+                form="suggestion-form"
+                type="submit"
+                className="w-full bg-primary-600 text-white font-black text-lg py-4 rounded-xl shadow-sm hover:bg-primary-700 active:scale-[0.98] transition-all"
+              >
+                Submit Suggestion
+              </button>
             </div>
           </div>
         </div>

@@ -48,7 +48,7 @@ export default function TeacherEnterMarks() {
   const enteredMarksCount = Object.values(marksState).filter(val => val !== '' && val !== null).length;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 pb-24 relative">
+    <div className="flex flex-col h-full bg-gray-50 relative">
       <div className="bg-white px-4 py-4 shadow-sm z-20 sticky top-0 border-b border-gray-100">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 text-gray-600">
@@ -108,7 +108,7 @@ export default function TeacherEnterMarks() {
 
       {/* Marks Entry List */}
       {selectedCombo ? (
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 pb-[100px]">
           <div className="flex justify-between items-center mb-2 px-1">
             <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">{latestExam.name}</span>
             <span className={`text-sm font-black ${enteredMarksCount === totalStudents ? 'text-green-600' : 'text-blue-600'}`}>
@@ -137,7 +137,10 @@ export default function TeacherEnterMarks() {
           ))}
 
           {/* Sticky Save Button */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 z-10 pb-safe">
+          <div 
+            className="fixed left-0 right-0 p-4 bg-white border-t border-gray-100 z-20"
+            style={{ bottom: 'var(--app-bottom-space)' }}
+          >
             <button 
               onClick={handleSave}
               disabled={isSaved}

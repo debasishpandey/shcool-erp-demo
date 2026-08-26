@@ -41,13 +41,16 @@ export default function ParentLayout() {
         )}
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto no-scrollbar pb-safe-bottom">
+        <main className="flex-1 overflow-y-auto no-scrollbar" style={{ paddingBottom: 'var(--app-bottom-space)' }}>
           <Outlet />
         </main>
 
         {/* Fixed Bottom Navigation */}
-        <div className="bg-white border-t border-gray-100 sticky bottom-0 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] px-2 pt-2">
-          <div className="flex justify-around items-center">
+        <div 
+          className="bg-white border-t border-gray-100 absolute bottom-0 left-0 right-0 z-[100] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]"
+          style={{ height: 'var(--app-bottom-nav-height)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex justify-around items-center h-full pt-1">
             {navItems.map((item) => {
               const isActive = location.pathname.includes(item.path);
               return (

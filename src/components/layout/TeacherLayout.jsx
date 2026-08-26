@@ -11,8 +11,8 @@ export default function TeacherLayout() {
         
         {/* Main Content Area - padded at bottom for the fixed nav */}
         <main 
-          className="flex-1 overflow-y-auto bg-gray-50 pb-24"
-          style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+          className="flex-1 overflow-y-auto bg-gray-50"
+          style={{ paddingBottom: 'var(--app-bottom-space)' }}
         >
           <Outlet />
         </main>
