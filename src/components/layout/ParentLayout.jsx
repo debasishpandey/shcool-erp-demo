@@ -1,101 +1,85 @@
-import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { BookOpen, User, Bell, LayoutDashboard, CreditCard, ClipboardList, LogOut } from 'lucide-react';
+import { Home, BookOpen, CreditCard, Bell, Menu, LogOut, ChevronLeft } from 'lucide-react';
 import clsx from 'clsx';
+import { parentProfile, childProfile, parentNotifications } from '../../data/parentMockData';
 
 export default function ParentLayout() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const isNested = location.pathname.split('/').length > 3 || location.pathname.includes('/receipt') || location.pathname.includes('/report-card');
+  const unreadNotifs = parentNotifications.filter(n => n.unread).length;
 
   const navItems = [
-    { name: 'Dashboard', path: '/parent/dashboard', icon: LayoutDashboard },
+    { name: 'Home', path: '/parent/dashboard', icon: Home },
+    { name: 'Academics', path: '/parent/academics', icon: BookOpen },
     { name: 'Fees', path: '/parent/fees', icon: CreditCard },
-    { name: 'Homework', path: '/parent/homework', icon: ClipboardList },
+    { name: 'Notices', path: '/parent/notifications', icon: Bell, badge: unreadNotifs },
+    { name: 'More', path: '/parent/more', icon: Menu },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Mobile Topbar */}
-      <div className="lg:hidden bg-primary-700 text-white flex items-center justify-between p-4 sticky top-0 z-50">
-        <div className="flex items-center gap-2 font-bold text-lg">
-          <BookOpen className="w-5 h-5" /> SchoolERP
-        </div>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} /></svg>
-        </button>
-      </div>
-
-      {/* Desktop Header */}
-      <div className="hidden lg:flex bg-primary-700 text-white h-16 items-center justify-between px-8 sticky top-0 z-50">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2 font-bold text-xl">
-            <BookOpen className="w-6 h-6" /> SchoolERP Parent
-          </div>
-          <nav className="flex gap-1">
-            {navItems.map(item => (
-              <Link 
-                key={item.name} 
-                to={item.path}
-                className={clsx(
-                  "px-4 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2",
-                  location.pathname === item.path ? "bg-primary-800 text-white" : "text-primary-100 hover:bg-primary-600"
+    <div className="min-h-screen bg-gray-900 md:flex md:items-center md:justify-center">
+      {/* Mobile Container (Centered on Desktop) */}
+      <div className="w-full h-screen md:h-[844px] md:w-[390px] bg-gray-50 md:rounded-[3rem] md:shadow-2xl md:overflow-hidden relative flex flex-col md:border-[8px] md:border-gray-800">
+        
+        {/* Dynamic Header */}
+        {!isNested && (
+          <div className="bg-primary-700 text-white px-4 pt-safe pb-4 sticky top-0 z-50 shadow-sm rounded-b-2xl">
+            <div className="flex justify-between items-start mt-2">
+              <div>
+                <p className="text-primary-100 text-xs font-bold uppercase tracking-wider mb-0.5">Good evening, {parentProfile.name} 👋</p>
+                <h1 className="font-black text-xl leading-tight">{childProfile.name}</h1>
+                <p className="text-primary-100 text-sm font-semibold">{childProfile.school} • Class {childProfile.class}</p>
+              </div>
+              <Link to="/parent/notifications" className="p-2 bg-primary-800 rounded-full text-white relative hover:bg-primary-600 transition-colors">
+                <Bell size={20} />
+                {unreadNotifs > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-primary-800"></span>
                 )}
-              >
-                <item.icon className="w-4 h-4" /> {item.name}
               </Link>
-            ))}
-          </nav>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 rounded-full hover:bg-primary-600 transition-colors relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-          <div className="flex items-center gap-3 border-l border-primary-600 pl-4">
-            <div className="w-8 h-8 rounded-full bg-white text-primary-700 flex items-center justify-center font-bold text-sm">
-              R
-            </div>
-            <div className="text-sm">
-              <p className="font-bold">Rajesh Sharma</p>
-              <p className="text-primary-200 text-xs">Parent of Aarav</p>
             </div>
           </div>
-          <Link to="/" className="ml-4 px-3 py-1.5 bg-white text-primary-700 rounded text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-1 border border-primary-600 shadow-sm">
-            <LogOut className="w-4 h-4" /> Exit Demo
-          </Link>
+        )}
+
+        {/* Content Area */}
+        <main className="flex-1 overflow-y-auto no-scrollbar pb-safe-bottom">
+          <Outlet />
+        </main>
+
+        {/* Fixed Bottom Navigation */}
+        <div className="bg-white border-t border-gray-100 sticky bottom-0 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] px-2 pt-2">
+          <div className="flex justify-around items-center">
+            {navItems.map((item) => {
+              const isActive = location.pathname.includes(item.path);
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="flex flex-col items-center p-2 min-w-[64px] relative"
+                >
+                  <div className={clsx(
+                    "p-1.5 rounded-xl transition-all duration-200 mb-1 relative",
+                    isActive ? "bg-primary-50 text-primary-600" : "text-gray-400 hover:text-gray-600"
+                  )}>
+                    <item.icon size={22} className={isActive ? "stroke-[2.5]" : "stroke-2"} />
+                    {item.badge > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className={clsx(
+                    "text-[10px] font-bold tracking-wide transition-colors",
+                    isActive ? "text-primary-700" : "text-gray-500"
+                  )}>
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
+
       </div>
-
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-gray-200 shadow-sm absolute w-full z-40">
-          <div className="p-4 space-y-2">
-            {navItems.map(item => (
-              <Link 
-                key={item.name} 
-                to={item.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={clsx(
-                  "flex items-center gap-3 p-3 rounded-lg font-medium",
-                  location.pathname === item.path ? "bg-primary-50 text-primary-700" : "text-gray-600"
-                )}
-              >
-                <item.icon className="w-5 h-5" /> {item.name}
-              </Link>
-            ))}
-            <div className="pt-4 mt-2 border-t border-gray-100">
-              <Link to="/" className="flex items-center justify-center w-full gap-2 p-3 bg-gray-100 text-gray-700 rounded-lg font-medium">
-                <LogOut className="w-5 h-5" /> Exit to Login
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-        <Outlet />
-      </main>
     </div>
   );
 }

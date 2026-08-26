@@ -22,6 +22,18 @@ import Settings from './pages/Settings';
 import Homework from './pages/Homework';
 import Documents from './pages/Documents';
 import ParentDashboard from './pages/parent/ParentDashboard';
+import ParentAcademics from './pages/parent/ParentAcademics';
+import ParentReportCard from './pages/parent/ParentReportCard';
+import ParentFees from './pages/parent/ParentFees';
+import ParentReceipt from './pages/parent/ParentReceipt';
+import ParentNotifications from './pages/parent/ParentNotifications';
+import ParentNotices from './pages/parent/ParentNotices';
+import ParentMore from './pages/parent/ParentMore';
+import ParentChildProfile from './pages/parent/ParentChildProfile';
+import ParentHomework from './pages/parent/ParentHomework';
+import ParentAttendance from './pages/parent/ParentAttendance';
+import ParentEvents from './pages/parent/ParentEvents';
+import ParentFeedback from './pages/parent/ParentFeedback';
 
 // Teacher Pages
 import TeacherHome from './pages/teacher/TeacherHome';
@@ -68,8 +80,18 @@ function App() {
         {/* Parent Portal Routes */}
         <Route element={<ParentLayout />}>
           <Route path="/parent/dashboard" element={<ParentDashboard />} />
-          <Route path="/parent/fees" element={<div className="p-8 text-center text-gray-500">Fees module coming soon to parent portal</div>} />
-          <Route path="/parent/homework" element={<div className="p-8 text-center text-gray-500">Homework module coming soon to parent portal</div>} />
+          <Route path="/parent/academics" element={<ParentAcademics />} />
+          <Route path="/parent/report-card" element={<ParentReportCard />} />
+          <Route path="/parent/fees" element={<ParentFees />} />
+          <Route path="/parent/receipt" element={<ParentReceipt />} />
+          <Route path="/parent/notifications" element={<ParentNotifications />} />
+          <Route path="/parent/notices" element={<ParentNotices />} />
+          <Route path="/parent/more" element={<ParentMore />} />
+          <Route path="/parent/child-profile" element={<ParentChildProfile />} />
+          <Route path="/parent/homework" element={<ParentHomework />} />
+          <Route path="/parent/attendance" element={<ParentAttendance />} />
+          <Route path="/parent/events" element={<ParentEvents />} />
+          <Route path="/parent/feedback" element={<ParentFeedback />} />
         </Route>
         
         {/* Teacher Mobile App Routes */}
