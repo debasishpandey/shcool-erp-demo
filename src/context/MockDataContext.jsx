@@ -25,6 +25,7 @@ export const MockDataProvider = ({ children }) => {
       feeTransactions: initialMockData.feeTransactions,
       exams: initialMockData.exams,
       notices: initialMockData.notices,
+      expenses: initialMockData.expenses,
       dashboardStats: initialMockData.dashboardStats,
       admissions: [
         { id: "ENQ-001", studentName: "Rohan Khanna", parentName: "Vivek Khanna", phone: "9876543111", appliedClass: "Class X", date: "2026-08-20", status: "New" },
@@ -144,6 +145,7 @@ export const MockDataProvider = ({ children }) => {
         class: `${student.class}-${student.section}`,
         amount: amount,
         method: method,
+        feeType: remarks || "Tuition Fee",
         date: new Date().toISOString().split('T')[0],
         status: "Successful"
       };
@@ -183,6 +185,22 @@ export const MockDataProvider = ({ children }) => {
     addActivity(`Homework assigned to ${hw.class}`);
   };
 
+  const recordExpense = (expense) => {
+    const newExpense = {
+      ...expense,
+      id: `EXP-${Date.now()}`,
+    };
+    setData(prev => ({
+      ...prev,
+      expenses: [newExpense, ...prev.expenses]
+    }));
+    addActivity(`Recorded expense: ₹${expense.amount} for ${expense.category}`);
+  };
+
+  const sendFeeReminder = (studentName, amount) => {
+    addActivity(`Fee reminder sent to ${studentName}'s parent for ₹${amount}`);
+  };
+
   return (
     <MockDataContext.Provider value={{ 
       data, 
@@ -190,6 +208,8 @@ export const MockDataProvider = ({ children }) => {
       addAdmission,
       convertAdmissionToStudent,
       recordFeePayment,
+      recordExpense,
+      sendFeeReminder,
       markAttendance,
       addNotice,
       addHomework,

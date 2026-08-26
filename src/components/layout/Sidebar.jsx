@@ -31,7 +31,8 @@ const navGroups = [
   {
     title: "FINANCE",
     items: [
-      { name: 'Fees', path: '/fees', icon: CreditCard },
+      { name: 'Accounts', path: '/accounts', icon: CreditCard },
+      { name: 'Expenses', path: '/expenses', icon: FileText },
       { name: 'Reports', path: '/reports', icon: BarChart2 },
     ]
   },

@@ -39,3 +39,29 @@
     color: #111827;
   }
 }
+
+@media print {
+  body {
+    background-color: white !important;
+  }
+  
+  /* Hide application shell elements when printing */
+  .no-print,
+  nav,
+  aside,
+  header {
+    display: none !important;
+  }
+
+  /* Target the printable area */
+  .print-area {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+}

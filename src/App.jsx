@@ -11,7 +11,8 @@ import StudentProfile from './pages/StudentProfile';
 import Teachers from './pages/Teachers';
 import Classes from './pages/Classes';
 import Attendance from './pages/Attendance';
-import Fees from './pages/Fees';
+import Accounts from './pages/Accounts';
+import Expenses from './pages/Expenses';
 import Examinations from './pages/Examinations';
 import Results from './pages/Results';
 import Timetable from './pages/Timetable';
@@ -66,7 +67,8 @@ function App() {
           <Route path="/classes" element={<Classes />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/homework" element={<Homework />} />
-          <Route path="/fees" element={<Fees />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/expenses" element={<Expenses />} />
           <Route path="/exams" element={<Examinations />} />
           <Route path="/results" element={<Results />} />
           <Route path="/timetable" element={<Timetable />} />
