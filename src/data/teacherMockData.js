@@ -1,42 +1,49 @@
 export const teacherProfile = {
   name: 'Priya Das',
   role: 'Mathematics Teacher',
-  assignedClasses: ['VIII-A', 'IX-B'],
   classTeacherOf: 'VIII-A'
 };
 
-export const todaysClasses = [
-  { id: 1, class: 'VIII-A', subject: 'Mathematics', time: '08:30 AM', studentCount: 42, attendanceMarked: false },
-  { id: 2, class: 'IX-B', subject: 'Mathematics', time: '09:30 AM', studentCount: 38, attendanceMarked: false },
-  { id: 3, class: 'VIII-A', subject: 'Mathematics', time: '11:00 AM', studentCount: 42, attendanceMarked: false } // Assuming extra class or different period
+export const todaysTeaching = [
+  { id: 1, class: 'VIII-A', subject: 'Mathematics', time: '08:30', isClassTeacher: true },
+  { id: 2, class: 'IX-B', subject: 'Mathematics', time: '09:30', isClassTeacher: false },
+  { id: 3, class: 'X-A', subject: 'Mathematics', time: '11:00', isClassTeacher: false },
+  { id: 4, class: 'VIII-B', subject: 'Science', time: '12:00', isClassTeacher: false }
+];
+
+export const teachingCombinations = [
+  { class: 'VIII-A', subject: 'Mathematics' },
+  { class: 'IX-B', subject: 'Mathematics' },
+  { class: 'X-A', subject: 'Mathematics' },
+  { class: 'VIII-B', subject: 'Science' }
 ];
 
 export const summaryStats = {
-  attendanceCompleted: 2,
-  attendanceTotal: 3,
-  homeworkAssigned: 2,
-  homeworkPending: 1,
-  concernsOpen: 1
+  attendancePercentage: 92,
+  homeworkAssigned: 3,
+  homeworkPending: 18,
+  concernsOpen: 2
 };
 
 export const studentsVIII_A = [
-  { rollNo: '01', name: 'Aarav Sharma', status: 'Present' },
-  { rollNo: '02', name: 'Aditi Gupta', status: 'Present' },
-  { rollNo: '03', name: 'Arjun Singh', status: 'Present' },
-  { rollNo: '04', name: 'Diya Patel', status: 'Present' },
-  { rollNo: '05', name: 'Ishaan Verma', status: 'Present' },
-  { rollNo: '06', name: 'Kavya Mishra', status: 'Present' },
-  { rollNo: '07', name: 'Krishna Rao', status: 'Present' },
-  { rollNo: '08', name: 'Meera Reddy', status: 'Present' },
-  { rollNo: '09', name: 'Neha Kumar', status: 'Present' },
-  { rollNo: '10', name: 'Pranav Joshi', status: 'Present' },
-  { rollNo: '11', name: 'Rohan Desai', status: 'Present' },
-  { rollNo: '12', name: 'Sanya Nair', status: 'Present' },
-  // Adding just a subset for demo purposes to avoid huge lists
-  { rollNo: '13', name: 'Vikram Singh', status: 'Present' },
-  { rollNo: '14', name: 'Riya Das', status: 'Present' },
-  { rollNo: '15', name: 'Rahul Chawla', status: 'Present' }
+  { rollNo: '01', name: 'Aarav Sharma', attendance: 78, concerns: 1, homeworkPending: 1, subjects: { Math: true, Science: true, English: false, SST: true, Hindi: true } },
+  { rollNo: '02', name: 'Priya Das', attendance: 81, concerns: 0, homeworkPending: 1, subjects: { Math: true, Science: true, English: true, SST: false, Hindi: true } },
+  { rollNo: '03', name: 'Rahul Singh', attendance: 83, concerns: 0, homeworkPending: 2, subjects: { Math: false, Science: true, English: false, SST: true, Hindi: true } },
+  { rollNo: '04', name: 'Diya Patel', attendance: 95, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '05', name: 'Ishaan Verma', attendance: 91, concerns: 0, homeworkPending: 1, subjects: { Math: false, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '06', name: 'Kavya Mishra', attendance: 88, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '07', name: 'Krishna Rao', attendance: 99, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '08', name: 'Meera Reddy', attendance: 94, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '09', name: 'Neha Kumar', attendance: 85, concerns: 0, homeworkPending: 2, subjects: { Math: false, Science: false, English: true, SST: true, Hindi: true } },
+  { rollNo: '10', name: 'Pranav Joshi', attendance: 96, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '11', name: 'Rohan Desai', attendance: 92, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '12', name: 'Sanya Nair', attendance: 89, concerns: 0, homeworkPending: 1, subjects: { Math: false, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '13', name: 'Vikram Singh', attendance: 97, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '14', name: 'Riya Das', attendance: 81, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } },
+  { rollNo: '15', name: 'Rahul Chawla', attendance: 83, concerns: 0, homeworkPending: 0, subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true } }
 ];
+
+export const studentsAttendanceList = studentsVIII_A.map(s => ({ rollNo: s.rollNo, name: s.name, status: 'Present' }));
 
 export const classAttendanceSummary = {
   class: 'VIII-A',
@@ -47,30 +54,25 @@ export const classAttendanceSummary = {
   late: 2,
   attentionNeeded: [
     { name: 'Aarav Sharma', percentage: 78 },
-    { name: 'Riya Das', percentage: 81 },
+    { name: 'Priya Das', percentage: 81 },
     { name: 'Rahul Chawla', percentage: 83 }
   ]
 };
 
-export const homeworkStatus = [
-  { id: 1, class: 'VIII-A', subject: 'Mathematics', date: '26 Aug', given: true, chapter: 'Chapter 4 — Algebra', completed: 34, total: 42 },
-  { id: 2, class: 'IX-B', subject: 'Mathematics', date: '26 Aug', given: false },
-  { id: 3, class: 'VIII-B', subject: 'Mathematics', date: '26 Aug', given: false }
+// Homework Assigned by THIS teacher
+export const myAssignments = [
+  { id: 1, class: 'VIII-A', subject: 'Mathematics', title: 'Chapter 4 — Algebra', completed: 34, total: 42 },
+  { id: 2, class: 'IX-B', subject: 'Mathematics', title: 'Exercise 5.2', completed: 31, total: 38 },
+  { id: 3, class: 'VIII-B', subject: 'Science', title: 'Photosynthesis Diagram', completed: 29, total: 40 }
 ];
 
-export const studentsHomeworkVIII_A = [
-  { rollNo: '01', name: 'Aarav Sharma', completed: true },
-  { rollNo: '02', name: 'Aditi Gupta', completed: true },
-  { rollNo: '03', name: 'Arjun Singh', completed: true },
-  { rollNo: '04', name: 'Diya Patel', completed: true },
-  { rollNo: '05', name: 'Ishaan Verma', completed: false }, // Pending
-  { rollNo: '06', name: 'Kavya Mishra', completed: true },
-  { rollNo: '07', name: 'Krishna Rao', completed: true },
-  { rollNo: '08', name: 'Meera Reddy', completed: true },
-  { rollNo: '09', name: 'Neha Kumar', completed: false }, // Pending
-  { rollNo: '10', name: 'Pranav Joshi', completed: true },
-  { rollNo: '11', name: 'Rohan Desai', completed: true },
-  { rollNo: '12', name: 'Sanya Nair', completed: false }, // Pending
+// All Subject Homework for VIII-A (Class Teacher View)
+export const allSubjectHomeworkVIII_A = [
+  { subject: 'Mathematics', title: 'Chapter 4 — Algebra', completed: 34, total: 42 },
+  { subject: 'Science', title: 'Photosynthesis', completed: 38, total: 42 },
+  { subject: 'English', title: 'Essay Writing', completed: 29, total: 42 },
+  { subject: 'Social Science', title: 'Chapter 3 Questions', completed: 31, total: 42 },
+  { subject: 'Hindi', title: 'Grammar Exercise', completed: 36, total: 42 }
 ];
 
 export const initialConcerns = [

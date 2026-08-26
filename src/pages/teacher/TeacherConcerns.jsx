@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, CheckCircle2, AlertCircle, X } from 'lucide-react';
-import { initialConcerns, studentsVIII_A } from '../../data/teacherMockData';
+import { initialConcerns, studentsVIII_A, teacherProfile } from '../../data/teacherMockData';
 
 export default function TeacherConcerns() {
   const [concerns, setConcerns] = useState(initialConcerns);
@@ -26,7 +26,7 @@ export default function TeacherConcerns() {
       type,
       message,
       status: 'Open',
-      date: '26 Aug 2026', // Mock date
+      date: '26 Aug 2026',
       parentNotified: true
     };
 
@@ -36,7 +36,6 @@ export default function TeacherConcerns() {
     setTimeout(() => {
       setIsSaved(false);
       setIsFormOpen(false);
-      // Reset form
       setStudent('');
       setType('Homework');
       setMessage('');
@@ -46,16 +45,19 @@ export default function TeacherConcerns() {
 
   const getUrgencyColor = (urg) => {
     switch(urg) {
-      case 'Urgent': return 'text-red-600 bg-red-50';
-      case 'Needs Attention': return 'text-orange-600 bg-orange-50';
-      default: return 'text-blue-600 bg-blue-50';
+      case 'Urgent': return 'text-red-700 bg-red-50 border-red-200';
+      case 'Needs Attention': return 'text-orange-700 bg-orange-50 border-orange-200';
+      default: return 'text-blue-700 bg-blue-50 border-blue-200';
     }
   };
 
   return (
     <div className="flex flex-col h-full bg-gray-50 pb-20 relative">
       <div className="bg-white px-4 py-4 shadow-sm z-10 sticky top-0 flex justify-between items-center">
-        <h1 className="font-bold text-gray-900 text-lg">Student Concerns</h1>
+        <div>
+          <h1 className="font-black text-gray-900 text-lg">Student Concerns</h1>
+          <p className="text-sm font-semibold text-primary-700">{teacherProfile.classTeacherOf} (My Class)</p>
+        </div>
         {!isFormOpen && (
           <button 
             onClick={() => setIsFormOpen(true)}
@@ -74,7 +76,7 @@ export default function TeacherConcerns() {
               <CheckCircle2 size={20} />
               <span>Concern raised successfully</span>
             </div>
-            <div className="text-sm bg-white/20 px-3 py-1 rounded-lg">
+            <div className="text-sm bg-white/20 px-3 py-1 rounded-lg font-medium">
               Parent notification prepared
             </div>
           </div>
@@ -85,7 +87,10 @@ export default function TeacherConcerns() {
       {isFormOpen && (
         <div className="fixed inset-0 bg-white z-40 flex flex-col max-w-[480px] mx-auto overflow-hidden">
           <div className="px-4 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-            <h2 className="font-bold text-gray-900 text-lg">Raise Concern</h2>
+            <div>
+              <h2 className="font-black text-gray-900 text-lg">Raise Concern</h2>
+              <p className="text-sm font-semibold text-primary-700">{teacherProfile.classTeacherOf}</p>
+            </div>
             <button onClick={() => setIsFormOpen(false)} className="p-2 -mr-2 text-gray-500 hover:bg-gray-100 rounded-full">
               <X size={24} />
             </button>
@@ -93,11 +98,11 @@ export default function TeacherConcerns() {
           
           <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">1. Select Student</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">1. Select Student</label>
               <select 
                 value={student} 
                 onChange={(e) => setStudent(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 font-medium outline-none"
                 required
               >
                 <option value="" disabled>Select from class VIII-A...</option>
@@ -108,17 +113,17 @@ export default function TeacherConcerns() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">2. Concern Type</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">2. Concern Type</label>
               <div className="flex flex-wrap gap-2">
                 {concernTypes.map(t => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setType(t)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${
                       type === t 
                         ? 'bg-primary-600 text-white' 
-                        : 'bg-gray-100 text-gray-600 border border-gray-200'
+                        : 'bg-gray-50 text-gray-600 border border-gray-200'
                     }`}
                   >
                     {t}
@@ -128,29 +133,29 @@ export default function TeacherConcerns() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">3. Message</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">3. Message</label>
               <textarea 
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Briefly describe the concern..."
                 rows={4}
-                className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 font-medium outline-none resize-none"
                 required
               ></textarea>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">4. Urgency (Optional)</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">4. Urgency (Optional)</label>
               <div className="flex flex-wrap gap-2">
                 {urgencyLevels.map(u => (
                   <button
                     key={u}
                     type="button"
                     onClick={() => setUrgency(u)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-full text-sm font-bold transition-colors border ${
                       urgency === u 
-                        ? getUrgencyColor(u) + ' border border-current'
-                        : 'bg-gray-100 text-gray-600 border border-gray-200'
+                        ? getUrgencyColor(u)
+                        : 'bg-gray-50 text-gray-600 border-gray-200'
                     }`}
                   >
                     {u}
@@ -163,7 +168,7 @@ export default function TeacherConcerns() {
               <button 
                 type="submit"
                 disabled={isSaved || !student || !message}
-                className="w-full bg-primary-600 text-white font-bold text-lg py-4 rounded-xl shadow-sm hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full bg-primary-600 text-white font-black text-lg py-4 rounded-xl shadow-sm hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isSaved ? 'Saving...' : 'Raise Concern'}
               </button>
@@ -182,8 +187,8 @@ export default function TeacherConcerns() {
                   <AlertCircle size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">{concern.student}</h3>
-                  <p className="text-xs text-gray-500">{concern.type} Concern • {concern.date}</p>
+                  <h3 className="font-bold text-gray-900 leading-tight">{concern.student}</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mt-1">{concern.type} • {concern.date}</p>
                 </div>
               </div>
               <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${
@@ -193,19 +198,18 @@ export default function TeacherConcerns() {
               </span>
             </div>
             
-            <p className="text-gray-700 text-sm bg-gray-50 p-3 rounded-xl border border-gray-100 mb-3">
+            <p className="text-gray-800 text-sm font-medium bg-gray-50 p-3 rounded-xl border border-gray-100 mb-3">
               "{concern.message}"
             </p>
             
             {concern.parentNotified && (
-              <div className="flex items-center gap-1.5 text-xs font-medium text-green-600">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-green-700">
                 <CheckCircle2 size={14} /> Parent Notified
               </div>
             )}
           </div>
         ))}
       </div>
-
     </div>
   );
 }

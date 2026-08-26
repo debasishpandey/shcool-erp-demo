@@ -1,105 +1,128 @@
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { todaysClasses, summaryStats } from '../../data/teacherMockData';
+import { Users, BookOpen, AlertCircle, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { teacherProfile, todaysTeaching, summaryStats } from '../../data/teacherMockData';
 
 export default function TeacherHome() {
   const navigate = useNavigate();
 
-  const handleMarkAttendance = (classId) => {
-    navigate('/teacher/attendance');
-  };
-
   return (
     <div className="p-4 space-y-6">
       
-      {/* Today's Classes */}
+      {/* MY CLASS */}
       <section>
-        <h2 className="text-lg font-bold text-gray-900 mb-3">Today's Classes</h2>
-        <div className="space-y-3">
-          {todaysClasses.map((cls) => (
-            <div key={cls.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-gray-900 text-lg">{cls.class}</h3>
-                  <p className="text-gray-500 text-sm">{cls.subject} • {cls.time}</p>
+        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">My Class</h2>
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-primary-100 flex flex-col gap-4 relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary-50 rounded-full opacity-50"></div>
+          
+          <div className="flex justify-between items-start relative z-10">
+            <div>
+              <h3 className="font-black text-gray-900 text-2xl">{teacherProfile.classTeacherOf}</h3>
+              <p className="text-primary-700 font-semibold text-sm">Class Teacher</p>
+            </div>
+            <div className="bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-bold">
+              42 Students
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 relative z-10">
+            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+              <p className="text-xs text-gray-500 font-semibold mb-1">Today's Attendance</p>
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                <span className="text-sm font-bold text-gray-900">Not Marked</span>
+              </div>
+              <button 
+                onClick={() => navigate('/teacher/attendance')}
+                className="w-full bg-primary-600 text-white py-1.5 rounded-lg text-xs font-bold hover:bg-primary-700 transition-colors"
+              >
+                Mark Now
+              </button>
+            </div>
+            
+            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col justify-between">
+              <div>
+                <p className="text-xs text-gray-500 font-semibold mb-1">Overview</p>
+                <div className="flex items-center gap-2 mb-1 text-sm font-bold text-gray-900">
+                  <span className="text-green-600">92%</span> Attendance
                 </div>
-                <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                  {cls.studentCount} Students
+                <div className="flex items-center gap-2 text-xs font-semibold text-gray-600">
+                  34/42 HW • 2 Concerns
+                </div>
+              </div>
+              <button 
+                onClick={() => navigate('/teacher/class-overview')}
+                className="w-full bg-white border border-gray-200 text-gray-700 py-1.5 rounded-lg text-xs font-bold mt-2 hover:bg-gray-50 transition-colors"
+              >
+                View Class
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TODAY'S TEACHING */}
+      <section>
+        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Today's Teaching</h2>
+        <div className="space-y-3">
+          {todaysTeaching.map((cls) => (
+            <div key={cls.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center">
+                    <span className="text-sm font-bold text-gray-900 leading-none">{cls.time.split(':')[0]}</span>
+                    <span className="text-[10px] text-gray-500 font-semibold mt-0.5">{cls.time.split(':')[1]}</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{cls.class} <span className="text-gray-400 font-normal">—</span> {cls.subject}</h3>
+                    {cls.isClassTeacher && (
+                      <span className="text-[10px] font-bold text-primary-600 uppercase tracking-wide">My Class</span>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <div className="pt-3 border-t border-gray-50 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${cls.attendanceMarked ? 'bg-green-500' : 'bg-amber-400'}`}></div>
-                  <span className="text-sm text-gray-600">
-                    {cls.attendanceMarked ? 'Attendance Marked' : 'Attendance Not Marked'}
-                  </span>
-                </div>
-                {!cls.attendanceMarked && (
+              <div className="pt-3 border-t border-gray-50 flex gap-2">
+                {cls.isClassTeacher && (
                   <button 
-                    onClick={() => handleMarkAttendance(cls.id)}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-primary-700 active:scale-95 transition-all"
+                    onClick={() => navigate('/teacher/attendance')}
+                    className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1 border border-gray-100"
                   >
-                    Mark
+                    <Users size={16} /> Attendance
                   </button>
                 )}
+                <button 
+                  onClick={() => navigate('/teacher/homework')}
+                  className={`flex-1 hover:bg-primary-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1 ${
+                    cls.isClassTeacher ? 'bg-primary-600' : 'bg-gray-900'
+                  }`}
+                >
+                  <BookOpen size={16} /> Homework
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Quick Actions */}
+      {/* HOME SUMMARY */}
       <section>
-        <h2 className="text-lg font-bold text-gray-900 mb-3">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <button 
-            onClick={() => navigate('/teacher/attendance')}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2 hover:border-primary-200 active:bg-gray-50 transition-all"
-          >
-            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-1">
-              <Users size={24} />
-            </div>
-            <span className="font-semibold text-sm text-gray-800">Attendance</span>
-          </button>
-          
-          <button 
-            onClick={() => navigate('/teacher/homework')}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2 hover:border-primary-200 active:bg-gray-50 transition-all"
-          >
-            <div className="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 mb-1">
-              <BookOpen size={24} />
-            </div>
-            <span className="font-semibold text-sm text-gray-800">Homework</span>
-          </button>
-          
-          <button 
-            onClick={() => navigate('/teacher/concerns')}
-            className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2 hover:border-primary-200 active:bg-gray-50 transition-all col-span-2"
-          >
-            <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 mb-1">
-              <AlertCircle size={24} />
-            </div>
-            <span className="font-semibold text-sm text-gray-800">Raise Concern</span>
-          </button>
-        </div>
-      </section>
-
-      {/* Today Summary */}
-      <section>
-        <h2 className="text-lg font-bold text-gray-900 mb-3">Today Summary</h2>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center">
-            <span className="text-2xl font-bold text-gray-900">{summaryStats.attendanceCompleted}/{summaryStats.attendanceTotal}</span>
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mt-1">Attendance</span>
+        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Quick Summary</h2>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center col-span-1">
+            <span className="text-xl font-bold text-green-600">{summaryStats.attendancePercentage}%</span>
+            <span className="text-[10px] text-gray-500 font-bold mt-1 leading-tight">Class Attd.</span>
           </div>
-          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center">
-            <span className="text-2xl font-bold text-gray-900">{summaryStats.homeworkAssigned}</span>
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mt-1">HW Assigned</span>
+          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center col-span-1">
+            <span className="text-xl font-bold text-gray-900">{summaryStats.homeworkAssigned}</span>
+            <span className="text-[10px] text-gray-500 font-bold mt-1 leading-tight">HW Given</span>
           </div>
-          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center">
-            <span className="text-2xl font-bold text-gray-900">{summaryStats.concernsOpen}</span>
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mt-1">Concerns</span>
+          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center col-span-1">
+            <span className="text-xl font-bold text-gray-900">{summaryStats.homeworkPending}</span>
+            <span className="text-[10px] text-gray-500 font-bold mt-1 leading-tight">HW Pending</span>
+          </div>
+          <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center col-span-1">
+            <span className="text-xl font-bold text-orange-600">{summaryStats.concernsOpen}</span>
+            <span className="text-[10px] text-gray-500 font-bold mt-1 leading-tight">Concerns</span>
           </div>
         </div>
       </section>

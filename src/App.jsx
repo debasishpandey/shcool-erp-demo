@@ -27,6 +27,7 @@ import ParentDashboard from './pages/parent/ParentDashboard';
 import TeacherHome from './pages/teacher/TeacherHome';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
 import ClassAttendanceSummary from './pages/teacher/ClassAttendanceSummary';
+import ClassOverview from './pages/teacher/ClassOverview';
 import TeacherHomework from './pages/teacher/TeacherHomework';
 import TeacherConcerns from './pages/teacher/TeacherConcerns';
 
@@ -70,6 +71,7 @@ function App() {
           <Route path="/teacher/home" element={<TeacherHome />} />
           <Route path="/teacher/attendance" element={<TeacherAttendance />} />
           <Route path="/teacher/attendance/summary" element={<ClassAttendanceSummary />} />
+          <Route path="/teacher/class-overview" element={<ClassOverview />} />
           <Route path="/teacher/homework" element={<TeacherHomework />} />
           <Route path="/teacher/concerns" element={<TeacherConcerns />} />
           <Route path="/teacher/more" element={<div className="p-8 text-center text-gray-500">More options coming soon</div>} />
