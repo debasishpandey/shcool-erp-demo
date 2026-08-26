@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import ParentLayout from './components/layout/ParentLayout';
+import TeacherLayout from './components/layout/TeacherLayout';
 import Marketing from './pages/Marketing';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -21,6 +22,13 @@ import Settings from './pages/Settings';
 import Homework from './pages/Homework';
 import Documents from './pages/Documents';
 import ParentDashboard from './pages/parent/ParentDashboard';
+
+// Teacher Pages
+import TeacherHome from './pages/teacher/TeacherHome';
+import TeacherAttendance from './pages/teacher/TeacherAttendance';
+import ClassAttendanceSummary from './pages/teacher/ClassAttendanceSummary';
+import TeacherHomework from './pages/teacher/TeacherHomework';
+import TeacherConcerns from './pages/teacher/TeacherConcerns';
 
 function App() {
   return (
@@ -55,6 +63,16 @@ function App() {
           <Route path="/parent/dashboard" element={<ParentDashboard />} />
           <Route path="/parent/fees" element={<div className="p-8 text-center text-gray-500">Fees module coming soon to parent portal</div>} />
           <Route path="/parent/homework" element={<div className="p-8 text-center text-gray-500">Homework module coming soon to parent portal</div>} />
+        </Route>
+        
+        {/* Teacher Mobile App Routes */}
+        <Route element={<TeacherLayout />}>
+          <Route path="/teacher/home" element={<TeacherHome />} />
+          <Route path="/teacher/attendance" element={<TeacherAttendance />} />
+          <Route path="/teacher/attendance/summary" element={<ClassAttendanceSummary />} />
+          <Route path="/teacher/homework" element={<TeacherHomework />} />
+          <Route path="/teacher/concerns" element={<TeacherConcerns />} />
+          <Route path="/teacher/more" element={<div className="p-8 text-center text-gray-500">More options coming soon</div>} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />
