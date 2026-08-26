@@ -30,6 +30,9 @@ import ClassAttendanceSummary from './pages/teacher/ClassAttendanceSummary';
 import ClassOverview from './pages/teacher/ClassOverview';
 import TeacherHomework from './pages/teacher/TeacherHomework';
 import TeacherConcerns from './pages/teacher/TeacherConcerns';
+import TeacherNotifications from './pages/teacher/TeacherNotifications';
+import TeacherEvents from './pages/teacher/TeacherEvents';
+import TeacherMore from './pages/teacher/TeacherMore';
 
 function App() {
   return (
@@ -74,7 +77,9 @@ function App() {
           <Route path="/teacher/class-overview" element={<ClassOverview />} />
           <Route path="/teacher/homework" element={<TeacherHomework />} />
           <Route path="/teacher/concerns" element={<TeacherConcerns />} />
-          <Route path="/teacher/more" element={<div className="p-8 text-center text-gray-500">More options coming soon</div>} />
+          <Route path="/teacher/notifications" element={<TeacherNotifications />} />
+          <Route path="/teacher/events" element={<TeacherEvents />} />
+          <Route path="/teacher/more" element={<TeacherMore />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />

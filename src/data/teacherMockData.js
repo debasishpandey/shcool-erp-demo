@@ -121,3 +121,32 @@ const generateMonthlyMatrix = () => {
 };
 
 export const monthlyAttendanceData = generateMonthlyMatrix();
+
+export const notificationsList = [
+  { id: 1, type: 'School Notice', title: 'School Holiday', description: 'School will remain closed tomorrow for Janmashtami.', date: 'Today • 10:30 AM', unread: true },
+  { id: 2, type: 'Event', title: 'Independence Day Celebration', description: '28 Aug • School Auditorium. All teachers report by 8:30 AM.', date: 'Yesterday • 2:00 PM', unread: true },
+  { id: 3, type: 'Academic', title: 'Unit Test Schedule', description: 'Unit Test for Class VIII begins from 2 Sep.', date: '24 Aug 2026', unread: true },
+  { id: 4, type: 'Parent Message', title: 'Parent suggestion received', description: 'New suggestion received for VIII-A regarding homework.', date: '24 Aug 2026', unread: true },
+  { id: 5, type: 'Staff Notice', title: 'Staff Meeting', description: 'Staff meeting at 3:30 PM in the conference room.', date: '23 Aug 2026', unread: false }
+];
+
+export const eventsList = [
+  { id: 1, title: 'Independence Day Celebration', date: '28 Aug 2026', day: 'Friday', time: '9:00 AM', venue: 'School Auditorium', note: 'Teacher reporting: 8:30 AM', type: 'Celebration' },
+  { id: 2, title: 'Parent-Teacher Meeting', date: '30 Aug 2026', day: 'Sunday', time: '10:00 AM – 1:00 PM', venue: 'Classrooms', note: 'All class teachers must be present.', type: 'Academic' },
+  { id: 3, title: 'Teachers\' Training Workshop', date: '3 Sep 2026', day: 'Thursday', time: '2:00 PM – 4:00 PM', venue: 'Staff Room', note: 'Topic: NEP 2020 Implementation', type: 'Staff' },
+  { id: 4, title: 'Annual Sports Practice', date: '6 Sep 2026', day: 'Sunday', time: '8:00 AM', venue: 'School Ground', note: 'For selected students only.', type: 'Sports' }
+];
+
+export const holidaysList = [
+  { id: 1, title: 'Independence Day Holiday', date: '29 Aug 2026', day: 'Saturday' },
+  { id: 2, title: 'Ganesh Chaturthi Holiday', date: '12 Sep 2026', day: 'Saturday' },
+  { id: 3, title: 'Gandhi Jayanti', date: '2 Oct 2026', day: 'Friday' },
+  { id: 4, title: 'Diwali Holiday', date: '20 Oct 2026', day: 'Tuesday' }
+];
+
+export const parentSuggestionsList = [
+  { id: 1, author: 'Rajesh Sharma', context: 'Parent of Aarav Sharma', category: 'Homework', message: 'Could the school consider sharing homework earlier in the evening so children have enough time to complete it?', date: '26 Aug 2026', status: 'New', anonymous: false },
+  { id: 2, author: 'Anonymous Parent', context: '', category: 'Facilities', message: 'Please improve the drinking water arrangements near the senior classrooms.', date: '25 Aug 2026', status: 'New', anonymous: true },
+  { id: 3, author: 'Neha Patel', context: 'Parent of Ananya Patel', category: 'Academic', message: 'Please consider adding more revision worksheets before the monthly test.', date: '22 Aug 2026', status: 'Reviewed', anonymous: false },
+  { id: 4, author: 'Anonymous Parent', context: '', category: 'Homework', message: 'Could the school provide a little more notice before holiday homework is assigned?', date: '20 Aug 2026', status: 'Reviewed', anonymous: true }
+];

@@ -1,13 +1,45 @@
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, AlertCircle, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { teacherProfile, todaysTeaching, summaryStats } from '../../data/teacherMockData';
+import { Users, BookOpen, AlertCircle, ChevronRight, CheckCircle2, Bell, MessageSquare, Calendar } from 'lucide-react';
+import { teacherProfile, todaysTeaching, summaryStats, notificationsList, parentSuggestionsList, eventsList } from '../../data/teacherMockData';
 
 export default function TeacherHome() {
   const navigate = useNavigate();
+  
+  const unreadNotifs = notificationsList.filter(n => n.unread).length;
+  const newSuggestions = parentSuggestionsList.filter(s => s.status === 'New').length;
+  const upcomingEvents = eventsList.slice(0, 2);
 
   return (
     <div className="p-4 space-y-6">
       
+      {/* QUICK INDICATORS */}
+      <section className="grid grid-cols-2 gap-3">
+        <div 
+          onClick={() => navigate('/teacher/notifications')}
+          className="bg-blue-50 border border-blue-100 p-3 rounded-xl flex items-center justify-between cursor-pointer active:bg-blue-100 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Bell size={18} className="text-blue-600" />
+            <span className="font-bold text-gray-900 text-sm">Notifications</span>
+          </div>
+          {unreadNotifs > 0 && (
+            <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{unreadNotifs} New</span>
+          )}
+        </div>
+        <div 
+          onClick={() => navigate('/teacher/concerns')}
+          className="bg-green-50 border border-green-100 p-3 rounded-xl flex items-center justify-between cursor-pointer active:bg-green-100 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <MessageSquare size={18} className="text-green-600" />
+            <span className="font-bold text-gray-900 text-sm">Suggestions</span>
+          </div>
+          {newSuggestions > 0 && (
+            <span className="bg-green-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{newSuggestions} New</span>
+          )}
+        </div>
+      </section>
+
       {/* MY CLASS */}
       <section>
         <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">My Class</h2>
@@ -124,6 +156,27 @@ export default function TeacherHome() {
             <span className="text-xl font-bold text-orange-600">{summaryStats.concernsOpen}</span>
             <span className="text-[10px] text-gray-500 font-bold mt-1 leading-tight">Concerns</span>
           </div>
+        </div>
+      </section>
+      
+      {/* UPCOMING EVENTS */}
+      <section>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Upcoming</h2>
+          <button onClick={() => navigate('/teacher/events')} className="text-xs font-bold text-primary-600">View All</button>
+        </div>
+        <div className="space-y-2">
+          {upcomingEvents.map(event => (
+            <div key={event.id} onClick={() => navigate('/teacher/events')} className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center gap-3 cursor-pointer active:bg-gray-50 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                <Calendar size={18} />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-sm leading-tight">{event.title}</h3>
+                <p className="text-xs text-gray-500 font-medium mt-0.5">{event.date} • {event.time}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
       
