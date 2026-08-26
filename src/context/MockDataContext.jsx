@@ -135,20 +135,37 @@ export const MockDataProvider = ({ children }) => {
   };
 
   const recordFeePayment = (studentId, amount, method, remarks) => {
+    const student = data.students.find(s => s.id === studentId);
+    if (!student) return null;
+
+    const exactTxn = {
+      id: `TXN-${Date.now()}`,
+      receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      student: student.name,
+      studentId: student.id,
+      admissionNo: student.admissionNo,
+      class: `${student.class}-${student.section}`,
+      amount: amount,
+      method: method,
+      feeType: remarks || "Tuition Fee",
+      date: new Date().toISOString().split('T')[0],
+      status: "Successful"
+    };
+
     setData(prev => {
       const studentIndex = prev.students.findIndex(s => s.id === studentId);
       if (studentIndex === -1) return prev;
 
-      const student = prev.students[studentIndex];
-      const newPaid = student.paidFee + amount;
-      const newPending = student.totalFee - newPaid;
+      const currentStudent = prev.students[studentIndex];
+      const newPaid = currentStudent.paidFee + amount;
+      const newPending = currentStudent.totalFee - newPaid;
       
       let newFeeStatus = "Pending";
       if (newPending <= 0) newFeeStatus = "Paid";
-      else if (student.feeStatus === "Overdue") newFeeStatus = "Overdue";
+      else if (currentStudent.feeStatus === "Overdue") newFeeStatus = "Overdue";
 
       const updatedStudent = {
-        ...student,
+        ...currentStudent,
         paidFee: newPaid,
         pendingFee: Math.max(0, newPending),
         feeStatus: newFeeStatus
@@ -157,36 +174,15 @@ export const MockDataProvider = ({ children }) => {
       const newStudents = [...prev.students];
       newStudents[studentIndex] = updatedStudent;
 
-      const newTxn = {
-        id: `TXN-${Date.now()}`,
-        receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
-        student: student.name,
-        class: `${student.class}-${student.section}`,
-        amount: amount,
-        method: method,
-        feeType: remarks || "Tuition Fee",
-        date: new Date().toISOString().split('T')[0],
-        status: "Successful"
-      };
-
       return {
         ...prev,
         students: newStudents,
-        feeTransactions: [newTxn, ...prev.feeTransactions]
+        feeTransactions: [exactTxn, ...prev.feeTransactions]
       };
     });
+    
     addActivity(`₹${amount} fee payment recorded`);
-    // Return a locally constructed copy so the caller can use it immediately without waiting for React state to cycle
-    return {
-      receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`, // Just an approximation since state is async
-      student: "Student",
-      class: "Class",
-      amount: amount,
-      method: method,
-      feeType: remarks || "Tuition Fee",
-      date: new Date().toISOString().split('T')[0],
-      status: "Successful"
-    };
+    return exactTxn;
   };
 
   const markAttendance = (studentId, status) => {

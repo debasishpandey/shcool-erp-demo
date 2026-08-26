@@ -1,13 +1,17 @@
 import { BarChart2, Download, FileText, PieChart, ChevronRight } from 'lucide-react';
 
 export default function Reports() {
-  const reports = [
-    { title: 'Student Attendance Report', desc: 'Detailed attendance records by class and section.', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { title: 'Fee Collection Report', desc: 'Daily, monthly, and yearly fee collection summaries.', icon: BarChart2, color: 'text-green-600', bg: 'bg-green-50' },
-    { title: 'Academic Performance', desc: 'Class-wise result analysis and comparative charts.', icon: PieChart, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { title: 'Teacher Attendance', desc: 'Staff attendance and leave records.', icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { title: 'Defaulter List', desc: 'List of students with pending fee dues over 30 days.', icon: FileText, color: 'text-red-600', bg: 'bg-red-50' },
+  const role = localStorage.getItem('demoUserRole') || 'admin';
+  
+  const allReports = [
+    { title: 'Student Attendance Report', desc: 'Detailed attendance records by class and section.', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50', forAccountant: false },
+    { title: 'Fee Collection Report', desc: 'Daily, monthly, and yearly fee collection summaries.', icon: BarChart2, color: 'text-green-600', bg: 'bg-green-50', forAccountant: true },
+    { title: 'Academic Performance', desc: 'Class-wise result analysis and comparative charts.', icon: PieChart, color: 'text-purple-600', bg: 'bg-purple-50', forAccountant: false },
+    { title: 'Teacher Attendance', desc: 'Staff attendance and leave records.', icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50', forAccountant: false },
+    { title: 'Defaulter List', desc: 'List of students with pending fee dues over 30 days.', icon: FileText, color: 'text-red-600', bg: 'bg-red-50', forAccountant: true },
   ];
+
+  const reports = allReports.filter(r => role === 'admin' || (role === 'accountant' && r.forAccountant));
 
   return (
     <div className="space-y-6">

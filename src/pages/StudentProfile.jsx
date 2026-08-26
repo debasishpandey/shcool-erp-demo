@@ -208,22 +208,95 @@ export default function StudentProfile() {
                   </div>
                   <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                     <div className="text-sm font-medium text-gray-500 mb-1">Total Absent</div>
-                    <div className="text-2xl font-bold text-red-600">8 Days</div>
+                    <div className="text-2xl font-bold text-red-600">3 Days</div>
                   </div>
                   <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                    <div className="text-sm font-medium text-gray-500 mb-1">On Leave</div>
-                    <div className="text-2xl font-bold text-amber-600">2 Days</div>
+                    <div className="text-sm font-medium text-gray-500 mb-1">Late</div>
+                    <div className="text-2xl font-bold text-amber-600">1 Day</div>
                   </div>
                 </div>
-                <div className="bg-white border border-gray-100 rounded-lg p-8 text-center text-gray-500 shadow-sm">
-                  Calendar view of attendance will render here.
+                
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">August 2026</h3>
+                    <span className="text-sm text-gray-500">Attendance Trend: <span className="text-green-600 font-medium">Improving</span> (Last 7 Days)</span>
+                  </div>
+                  <div className="grid grid-cols-7 gap-2 text-center text-sm">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                      <div key={d} className="font-medium text-gray-500 py-2">{d}</div>
+                    ))}
+                    {Array.from({ length: 31 }).map((_, i) => {
+                      const date = i + 1;
+                      let status = 'P';
+                      let colorClass = 'bg-green-100 text-green-700 font-bold';
+                      
+                      if (date === 8 || date === 14 || date === 20) {
+                        status = 'A';
+                        colorClass = 'bg-red-100 text-red-700 font-bold';
+                      } else if (date === 5) {
+                        status = 'L';
+                        colorClass = 'bg-amber-100 text-amber-700 font-bold';
+                      } else if (date % 7 === 1 || date % 7 === 2) {
+                        // Weekends
+                        status = '-';
+                        colorClass = 'text-gray-400 bg-gray-50';
+                      }
+                      
+                      return (
+                        <div key={i} className={`p-3 rounded-md flex flex-col items-center justify-center border border-transparent ${date <= 26 ? colorClass : 'text-gray-300'}`}>
+                          <span className="text-xs mb-1 opacity-70">{date}</span>
+                          {date <= 26 ? status : ''}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
             {activeTab === 'academics' && (
-              <div className="bg-white border border-gray-100 rounded-lg p-8 text-center text-gray-500 shadow-sm">
-                Subject-wise marks and performance charts will render here.
+              <div className="space-y-6">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">Current Performance</h3>
+                    <p className="text-sm text-gray-500">Based on recent tests and assignments.</p>
+                  </div>
+                  <div className="flex gap-6 text-center">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">Overall</p>
+                      <p className="text-2xl font-bold text-gray-900">78%</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">Grade</p>
+                      <p className="text-2xl font-bold text-primary-600">B+</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">Class Avg</p>
+                      <p className="text-2xl font-bold text-gray-600">76.8%</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <h3 className="text-lg font-medium text-gray-900 mt-8 mb-4">Subject Wise Performance</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { sub: 'Mathematics', score: '84 / 100', grade: 'B+', color: 'text-green-600', bg: 'bg-green-50' },
+                    { sub: 'Science', score: '78 / 100', grade: 'B+', color: 'text-blue-600', bg: 'bg-blue-50' },
+                    { sub: 'English', score: '72 / 100', grade: 'B', color: 'text-amber-600', bg: 'bg-amber-50' },
+                    { sub: 'Social Science', score: '81 / 100', grade: 'A', color: 'text-purple-600', bg: 'bg-purple-50' },
+                    { sub: 'Hindi', score: '75 / 100', grade: 'B+', color: 'text-pink-600', bg: 'bg-pink-50' },
+                  ].map(subject => (
+                    <div key={subject.sub} className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">{subject.sub}</p>
+                        <p className="text-xl font-bold text-gray-700">{subject.score}</p>
+                      </div>
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${subject.bg} ${subject.color}`}>
+                        {subject.grade}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -273,19 +346,90 @@ export default function StudentProfile() {
             )}
 
             {activeTab === 'examinations' && (
-              <div className="bg-white border border-gray-100 rounded-lg p-8 text-center text-gray-500 shadow-sm">
-                Exam schedule and results will render here.
+              <div className="space-y-6">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <span className="inline-block px-2 py-1 bg-primary-100 text-primary-800 text-xs font-semibold rounded mb-2">Latest Exam</span>
+                      <h3 className="text-xl font-bold text-gray-900">Unit Test 1</h3>
+                      <p className="text-sm text-gray-500">Conducted on 10 Aug 2026</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-black text-gray-900">390 <span className="text-xl text-gray-400 font-medium">/ 500</span></p>
+                      <p className="text-sm font-medium text-green-600">78% • Grade B+</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
+                    <div><p className="text-xs text-gray-500">Mathematics</p><p className="font-semibold text-gray-900">84</p></div>
+                    <div><p className="text-xs text-gray-500">Science</p><p className="font-semibold text-gray-900">78</p></div>
+                    <div><p className="text-xs text-gray-500">English</p><p className="font-semibold text-gray-900">72</p></div>
+                    <div><p className="text-xs text-gray-500">Social Science</p><p className="font-semibold text-gray-900">81</p></div>
+                    <div><p className="text-xs text-gray-500">Hindi</p><p className="font-semibold text-gray-900">75</p></div>
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-medium text-gray-900 mt-6 mb-3">Upcoming Exams</h3>
+                <div className="bg-white shadow-sm rounded-lg border border-gray-200 divide-y divide-gray-100">
+                  <div className="flex justify-between items-center p-4 hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-50 text-blue-700 rounded-md p-2 text-center w-14">
+                        <div className="text-xs font-bold uppercase">Aug</div>
+                        <div className="text-lg font-black leading-none">28</div>
+                      </div>
+                      <p className="font-medium text-gray-900">Mathematics (Unit Test 2)</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center p-4 hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-50 text-blue-700 rounded-md p-2 text-center w-14">
+                        <div className="text-xs font-bold uppercase">Aug</div>
+                        <div className="text-lg font-black leading-none">30</div>
+                      </div>
+                      <p className="font-medium text-gray-900">Science (Unit Test 2)</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center p-4 hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-50 text-blue-700 rounded-md p-2 text-center w-14">
+                        <div className="text-xs font-bold uppercase">Sep</div>
+                        <div className="text-lg font-black leading-none">02</div>
+                      </div>
+                      <p className="font-medium text-gray-900">English (Unit Test 2)</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
             {activeTab === 'documents' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {['Birth Certificate', 'Aadhaar Card', 'Previous Marksheet', 'Transfer Certificate', 'Address Proof'].map((doc, idx) => (
-                  <div key={idx} className="border border-gray-200 rounded-lg p-4 flex items-start gap-3">
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><FileText size={20} /></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { name: 'Birth Certificate', status: 'Uploaded' },
+                  { name: 'Aadhaar Card / ID', status: 'Uploaded' },
+                  { name: 'Previous Marksheet', status: 'Uploaded' },
+                  { name: 'Transfer Certificate', status: 'Missing' },
+                  { name: 'Address Proof', status: 'Uploaded' },
+                ].map((doc, idx) => (
+                  <div key={idx} className="border border-gray-200 bg-white rounded-lg p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className={`p-2 rounded-lg ${doc.status === 'Uploaded' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
+                        <FileText size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{doc.name}</p>
+                        {doc.status === 'Uploaded' ? (
+                          <p className="text-xs text-green-600 mt-1 flex items-center gap-1 font-medium"><CheckCircle2 size={12} /> Uploaded</p>
+                        ) : (
+                          <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium"><Plus size={12} /> Not Uploaded</p>
+                        )}
+                      </div>
+                    </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{doc}</p>
-                      <p className="text-xs text-green-600 mt-1 flex items-center gap-1"><CheckCircle2 size={12} /> Uploaded</p>
+                      {doc.status === 'Uploaded' ? (
+                        <button className="w-full py-1.5 text-sm font-medium border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">View Document</button>
+                      ) : (
+                        <button className="w-full py-1.5 text-sm font-medium border border-primary-300 rounded-md text-primary-700 bg-primary-50 hover:bg-primary-100">Upload Now</button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -293,8 +437,52 @@ export default function StudentProfile() {
             )}
 
             {activeTab === 'communication' && (
-              <div className="bg-white border border-gray-100 rounded-lg p-8 text-center text-gray-500 shadow-sm">
-                SMS and WhatsApp communication history will render here.
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-medium text-gray-900">Recent Communication</h3>
+                </div>
+                <div className="relative border-l border-gray-200 ml-3 space-y-6 pb-4">
+                  <div className="relative pl-6">
+                    <span className="absolute -left-1.5 top-1 bg-white border-2 border-primary-500 w-3 h-3 rounded-full"></span>
+                    <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm relative -top-3">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-bold text-gray-900">Parent Suggestion</span>
+                        <span className="text-xs text-gray-500">Today, 9:15 AM</span>
+                      </div>
+                      <p className="text-sm text-gray-600">"Could homework be shared before 6 PM on the app?"</p>
+                    </div>
+                  </div>
+                  <div className="relative pl-6">
+                    <span className="absolute -left-1.5 top-1 bg-white border-2 border-red-500 w-3 h-3 rounded-full"></span>
+                    <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm relative -top-3">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-bold text-gray-900">Attendance Alert</span>
+                        <span className="text-xs text-gray-500">20 Aug 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-600">SMS sent to parent: Aarav was marked absent today.</p>
+                    </div>
+                  </div>
+                  <div className="relative pl-6">
+                    <span className="absolute -left-1.5 top-1 bg-white border-2 border-amber-500 w-3 h-3 rounded-full"></span>
+                    <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm relative -top-3">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-bold text-gray-900">Fee Reminder</span>
+                        <span className="text-xs text-gray-500">18 Aug 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-600">WhatsApp message sent regarding ₹6,000 pending fee due.</p>
+                    </div>
+                  </div>
+                  <div className="relative pl-6">
+                    <span className="absolute -left-1.5 top-1 bg-white border-2 border-blue-500 w-3 h-3 rounded-full"></span>
+                    <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm relative -top-3">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-bold text-gray-900">Homework Update</span>
+                        <span className="text-xs text-gray-500">15 Aug 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-600">App Notification: English homework pending submission.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

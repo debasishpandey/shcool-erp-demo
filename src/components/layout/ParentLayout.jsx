@@ -47,7 +47,7 @@ export default function ParentLayout() {
 
         {/* Fixed Bottom Navigation */}
         <div 
-          className="bg-white border-t border-gray-100 absolute bottom-0 left-0 right-0 z-[100] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]"
+          className="bg-white border-t border-gray-100 fixed bottom-0 left-0 right-0 z-[100] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]"
           style={{ height: 'var(--app-bottom-nav-height)', paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
           <div className="flex justify-around items-center h-full pt-1">

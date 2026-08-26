@@ -174,10 +174,19 @@ const generateExamResults = () => {
   // Use the 15 hardcoded students and generate the remaining 27 to make 42 total
   const allStudents = [...studentsVIII_A];
   
+  const remainingNames = [
+    "Aarohi Gupta", "Aditya Jain", "Akshay Kumar", "Ananya Reddy", "Arjun Bhatia",
+    "Avni Sharma", "Ayush Mehra", "Bhavya Patel", "Chirag Desai", "Devansh Kapoor",
+    "Diya Singh", "Gaurav Malhotra", "Isha Iyer", "Kabir Nair", "Kavya Das",
+    "Manish Varma", "Navya Chawla", "Neil Menon", "Nidhi Agarwal", "Prisha Joshi",
+    "Reyansh Thakur", "Riya Pandey", "Rohan Sen", "Shruti Tiwari", "Tara Saxena",
+    "Vihaan Malik", "Yash Seth"
+  ];
+
   for (let i = 16; i <= 42; i++) {
     allStudents.push({
       rollNo: i.toString().padStart(2, '0'),
-      name: `Student ${i}`,
+      name: remainingNames[i - 16] || `Student ${i}`,
       attendance: 75 + (i % 20),
       concerns: i % 10 === 0 ? 1 : 0,
       homeworkPending: i % 5,

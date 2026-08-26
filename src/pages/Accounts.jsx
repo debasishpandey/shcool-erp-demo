@@ -87,21 +87,13 @@ export default function Accounts() {
     }
 
     setPaymentError('');
-    recordFeePayment(selectedPayStudent.id, amt, payMethod, payFeeType);
+    const exactTxn = recordFeePayment(selectedPayStudent.id, amt, payMethod, payFeeType);
     
-    // Create local receipt for the success screen
-    const newReceipt = {
-      receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
-      student: selectedPayStudent.name,
-      class: `${selectedPayStudent.class}-${selectedPayStudent.section}`,
-      amount: amt,
-      method: payMethod,
-      feeType: payFeeType,
-      date: new Date().toISOString().split('T')[0],
-      status: "Successful"
-    };
-    
-    setPaymentSuccessData(newReceipt);
+    if (exactTxn) {
+      setPaymentSuccessData(exactTxn);
+    } else {
+      setPaymentError("Failed to record payment. Please try again.");
+    }
   };
 
   const openPaymentModal = (student) => {
@@ -154,6 +146,12 @@ export default function Accounts() {
   const totalOverdue = students.filter(s => s.feeStatus === 'Overdue').reduce((sum, s) => sum + s.pendingFee, 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const netCollection = totalCollected - totalExpenses;
+  
+  // Today's Collection
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todaysCollection = feeTransactions
+    .filter(txn => txn.date === todayStr)
+    .reduce((sum, txn) => sum + txn.amount, 0);
 
   return (
     <>
@@ -223,7 +221,7 @@ export default function Accounts() {
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg border border-green-100">
                     <p className="text-xs font-medium text-green-700 mb-1">Today's Collection</p>
-                    <p className="text-xl font-bold text-green-700">₹45,000</p>
+                    <p className="text-xl font-bold text-green-700">₹{todaysCollection.toLocaleString()}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                     <p className="text-xs font-medium text-gray-500 mb-1">Total Expenses</p>

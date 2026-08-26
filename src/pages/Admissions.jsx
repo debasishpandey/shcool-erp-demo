@@ -27,8 +27,9 @@ export default function Admissions() {
 
   const handleConvert = (id) => {
     convertAdmissionToStudent(id);
-    setShowSuccess('Enquiry successfully converted to Student!');
-    setTimeout(() => setShowSuccess(''), 3000);
+    const newAdmissionNo = `ADM-2026-${Math.floor(100 + Math.random() * 900)}`;
+    setShowSuccess(`Enquiry successfully converted to Student (Admission No: ${newAdmissionNo})!`);
+    setTimeout(() => setShowSuccess(''), 4000);
   };
 
   const stats = {
@@ -148,7 +149,9 @@ export default function Admissions() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     {admission.status === 'Admitted' ? (
-                      <span className="text-gray-400">Converted</span>
+                      <span className="inline-flex items-center gap-1 text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100 font-bold text-xs">
+                        <CheckCircle2 size={14} /> Converted
+                      </span>
                     ) : (
                       <button 
                         onClick={() => handleConvert(admission.id)}
