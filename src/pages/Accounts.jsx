@@ -35,6 +35,7 @@ export default function Accounts() {
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const selectedPayStudent = students.find(s => s.id.toString() === payStudentId.toString());
 
@@ -151,10 +152,19 @@ export default function Accounts() {
   const handlePrintReceipt = (txn) => {
     setSelectedReceipt(txn);
     setShowReceiptModal(true);
-    setTimeout(() => {
-      window.print();
-    }, 150);
+    setIsPrinting(true);
   };
+
+  useEffect(() => {
+    if (isPrinting && showReceiptModal && selectedReceipt) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.print();
+          setIsPrinting(false);
+        });
+      });
+    }
+  }, [isPrinting, showReceiptModal, selectedReceipt]);
   
   // Aggregate stats
   const totalFeeCollection = students.reduce((sum, s) => sum + s.totalFee, 0);
@@ -595,6 +605,10 @@ export default function Accounts() {
                       <div className="flex justify-between border-b pb-2">
                         <span className="text-gray-500">Class:</span>
                         <span className="font-semibold text-gray-900">{paymentSuccessData.class}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-gray-500">Previous Due:</span>
+                        <span className="font-semibold text-gray-900">₹{paymentSuccessData.previousDue.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between border-b pb-2">
                         <span className="text-gray-500">Amount Paid:</span>

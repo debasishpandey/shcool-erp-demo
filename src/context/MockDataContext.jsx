@@ -135,59 +135,65 @@ export const MockDataProvider = ({ children }) => {
   };
 
   const recordFeePayment = (studentId, amount, method, feeType, remarks) => {
-    const student = data.students.find(s => s.id === studentId);
-    if (!student) return null;
-
-    const remainingDue = Math.max(0, student.pendingFee - amount);
-
-    const exactTxn = {
-      id: `TXN-${Date.now()}`,
-      receiptNo: `REC-2026-${Math.floor(100 + Math.random() * 900)}`,
-      student: student.name,
-      studentId: student.id,
-      admissionNo: student.admissionNo,
-      class: `${student.class}-${student.section}`,
-      amount: amount,
-      method: method,
-      feeType: feeType || "Tuition Fee",
-      remarks: remarks || "",
-      previousDue: student.pendingFee,
-      remainingDue: remainingDue,
-      date: "2026-08-26",
-      status: "Successful"
-    };
-
+    let createdTransaction = null;
+    
     setData(prev => {
-      const studentIndex = prev.students.findIndex(s => s.id === studentId);
+      const studentIndex = prev.students.findIndex(s => String(s.id) === String(studentId));
       if (studentIndex === -1) return prev;
 
       const currentStudent = prev.students[studentIndex];
+      if (!Number.isFinite(amount) || amount <= 0) return prev;
+      if (amount > currentStudent.pendingFee) return prev;
+
+      const previousDue = currentStudent.pendingFee;
+      const remainingDue = Math.max(0, previousDue - amount);
+      const receiptNo = `REC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      createdTransaction = {
+        id: `TXN-${Date.now()}`,
+        receiptNo,
+        student: currentStudent.name,
+        studentId: currentStudent.id,
+        admissionNo: currentStudent.admissionNo,
+        class: `${currentStudent.class}-${currentStudent.section}`,
+        amount,
+        method,
+        feeType: feeType || "Tuition Fee",
+        remarks: remarks || "",
+        previousDue,
+        remainingDue,
+        date: "2026-08-26",
+        status: "Successful"
+      };
+
       const newPaid = currentStudent.paidFee + amount;
-      const newPending = currentStudent.totalFee - newPaid;
-      
-      let newFeeStatus = "Pending";
-      if (newPending <= 0) newFeeStatus = "Paid";
-      else if (currentStudent.feeStatus === "Overdue") newFeeStatus = "Overdue";
+      let newFeeStatus = remainingDue === 0 ? "Paid" : currentStudent.feeStatus === "Overdue" ? "Overdue" : "Pending";
 
       const updatedStudent = {
         ...currentStudent,
         paidFee: newPaid,
-        pendingFee: Math.max(0, newPending),
+        pendingFee: remainingDue,
         feeStatus: newFeeStatus
       };
 
       const newStudents = [...prev.students];
       newStudents[studentIndex] = updatedStudent;
 
+      const activity = {
+        id: `ACT-${Date.now()}`,
+        text: `₹${amount.toLocaleString()} fee payment recorded for ${currentStudent.name}`,
+        time: 'Just now'
+      };
+
       return {
         ...prev,
         students: newStudents,
-        feeTransactions: [exactTxn, ...prev.feeTransactions]
+        feeTransactions: [createdTransaction, ...prev.feeTransactions],
+        activities: [activity, ...prev.activities].slice(0, 15)
       };
     });
     
-    addActivity(`₹${amount} fee payment recorded`);
-    return exactTxn;
+    return createdTransaction;
   };
 
   const markAttendance = (studentId, status) => {
