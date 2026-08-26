@@ -7,7 +7,7 @@ export default function Login() {
   const roles = [
     { id: 'admin', title: 'Admin / Principal', icon: Shield, color: 'bg-primary-100 text-primary-700', path: '/dashboard', desc: 'Full system access & operations overview' },
     { id: 'teacher', title: 'Teacher', icon: Briefcase, color: 'bg-blue-100 text-blue-700', path: '/teacher/home', desc: 'Manage classes, attendance & homework' },
-    { id: 'accountant', title: 'Accountant', icon: BookOpen, color: 'bg-green-100 text-green-700', path: '/accounts', desc: 'Manage fee collections & finances' },
+    { id: 'accountant', title: 'Accountant', icon: Calculator, color: 'bg-emerald-100 text-emerald-700', path: '/accountant', desc: 'Manage collections, dues, receipts & school expenses' },
     { id: 'parent', title: 'Parent Portal', icon: MonitorSmartphone, color: 'bg-purple-100 text-purple-700', path: '/parent/dashboard', desc: 'View child progress, fees & attendance' },
   ];
 

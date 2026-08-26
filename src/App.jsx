@@ -68,6 +68,7 @@ function App() {
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/homework" element={<Homework />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/accountant" element={<Accounts />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/exams" element={<Examinations />} />
           <Route path="/results" element={<Results />} />

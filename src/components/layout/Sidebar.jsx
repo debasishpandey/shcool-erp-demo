@@ -70,7 +70,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     if (role === 'admin') return group;
     
     if (role === 'accountant') {
-      const allowedPaths = ['/dashboard', '/students', '/classes', '/accounts', '/expenses', '/reports', '/notices', '/settings'];
+      const allowedPaths = ['/dashboard', '/students', '/classes', '/accountant', '/accounts', '/expenses', '/reports', '/notices', '/settings'];
       const filteredItems = group.items.filter(item => allowedPaths.includes(item.path));
       if (filteredItems.length > 0) {
         return { ...group, items: filteredItems };
