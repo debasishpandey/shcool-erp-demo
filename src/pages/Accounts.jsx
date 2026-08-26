@@ -27,13 +27,14 @@ export default function Accounts() {
   const [feeStatusFilter, setFeeStatusFilter] = useState('All Fee Statuses');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Payment Form State
   const [payStudentId, setPayStudentId] = useState('');
   const [payAmount, setPayAmount] = useState('');
   const [payMethod, setPayMethod] = useState('UPI');
   const [payFeeType, setPayFeeType] = useState('Tuition Fee');
+  const [paymentRemarks, setPaymentRemarks] = useState('');
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedPayStudent = students.find(s => s.id.toString() === payStudentId.toString());
 
@@ -73,42 +74,50 @@ export default function Accounts() {
 
   const handlePaymentSubmit = (e) => {
     e.preventDefault();
-    if (!selectedPayStudent) return;
+    if (!selectedPayStudent || isSubmitting) return;
     
+    setIsSubmitting(true);
     const amt = parseInt(payAmount);
     if (isNaN(amt) || amt <= 0) {
       setPaymentError("Please enter a valid amount greater than 0.");
+      setIsSubmitting(false);
       return;
     }
     
     if (amt > selectedPayStudent.pendingFee) {
       setPaymentError(`Payment cannot exceed current due of ₹${selectedPayStudent.pendingFee.toLocaleString()}.`);
+      setIsSubmitting(false);
       return;
     }
 
     setPaymentError('');
-    const exactTxn = recordFeePayment(selectedPayStudent.id, amt, payMethod, payFeeType);
+    const exactTxn = recordFeePayment(selectedPayStudent.id, amt, payMethod, payFeeType, paymentRemarks);
     
     if (exactTxn) {
       setPaymentSuccessData(exactTxn);
     } else {
       setPaymentError("Failed to record payment. Please try again.");
     }
+    setIsSubmitting(false);
   };
 
   const openPaymentModal = (student) => {
     setPayStudentId(student ? student.id.toString() : '');
-    setPayAmount(student ? student.pendingFee.toString() : '');
+    setPayAmount(student && student.pendingFee > 0 ? student.pendingFee.toString() : '');
+    setPayMethod('UPI');
+    setPayFeeType('Tuition Fee');
+    setPaymentRemarks('');
     setPaymentError('');
     setPaymentSuccessData(null);
+    setIsSubmitting(false);
     setShowPaymentModal(true);
   };
 
   useEffect(() => {
-    // When student changes, reset error and auto-fill amount
+    // When student changes, reset error and auto-fill amount if pendingFee > 0
     setPaymentError('');
     if (selectedPayStudent && !paymentSuccessData) {
-      setPayAmount(selectedPayStudent.pendingFee.toString());
+      setPayAmount(selectedPayStudent.pendingFee > 0 ? selectedPayStudent.pendingFee.toString() : '');
     }
   }, [payStudentId, selectedPayStudent, paymentSuccessData]);
 
@@ -138,6 +147,14 @@ export default function Accounts() {
   const handlePrint = () => {
     window.print();
   };
+
+  const handlePrintReceipt = (txn) => {
+    setSelectedReceipt(txn);
+    setShowReceiptModal(true);
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  };
   
   // Aggregate stats
   const totalFeeCollection = students.reduce((sum, s) => sum + s.totalFee, 0);
@@ -147,11 +164,15 @@ export default function Accounts() {
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const netCollection = totalCollected - totalExpenses;
   
-  // Today's Collection
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todaysCollection = feeTransactions
-    .filter(txn => txn.date === todayStr)
-    .reduce((sum, txn) => sum + txn.amount, 0);
+  // Today's Collection & Breakdown (Fixed demo date to align with mock transactions)
+  const todayStr = "2026-08-26";
+  const todaysTransactions = feeTransactions.filter(txn => txn.date === todayStr && txn.status === 'Successful');
+  
+  const todaysCollection = todaysTransactions.reduce((sum, txn) => sum + txn.amount, 0);
+  const todayBreakdown = todaysTransactions.reduce((acc, txn) => {
+    acc[txn.method] = (acc[txn.method] || 0) + txn.amount;
+    return acc;
+  }, { Cash: 0, UPI: 0, Card: 0, 'Bank Transfer': 0, Cheque: 0 });
 
   return (
     <>
@@ -293,23 +314,27 @@ export default function Accounts() {
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-500">Cash</span>
-                          <span className="text-sm font-medium text-gray-900">₹12,000</span>
+                          <span className="text-sm font-medium text-gray-900">₹{todayBreakdown.Cash.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-500">UPI</span>
-                          <span className="text-sm font-medium text-gray-900">₹21,000</span>
+                          <span className="text-sm font-medium text-gray-900">₹{todayBreakdown.UPI.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-500">Card</span>
-                          <span className="text-sm font-medium text-gray-900">₹8,000</span>
+                          <span className="text-sm font-medium text-gray-900">₹{todayBreakdown.Card.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-500">Bank Transfer</span>
-                          <span className="text-sm font-medium text-gray-900">₹4,000</span>
+                          <span className="text-sm font-medium text-gray-900">₹{todayBreakdown['Bank Transfer'].toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-500">Cheque</span>
+                          <span className="text-sm font-medium text-gray-900">₹{todayBreakdown.Cheque.toLocaleString()}</span>
                         </div>
                         <div className="pt-3 mt-3 border-t border-gray-100 flex justify-between items-center">
                           <span className="text-sm font-bold text-gray-900">Total</span>
-                          <span className="text-sm font-bold text-green-600">₹45,000</span>
+                          <span className="text-sm font-bold text-green-600">₹{todaysCollection.toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -557,41 +582,49 @@ export default function Accounts() {
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                       <CheckCircle2 className="h-6 w-6 text-green-600" />
                     </div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">Payment Recorded Successfully</h3>
-                    <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-left mb-6">
-                      <div className="flex justify-between mb-2">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Payment Recorded Successfully</h3>
+                    <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-left mb-6 space-y-2">
+                      <div className="flex justify-between border-b pb-2">
                         <span className="text-gray-500">Receipt No:</span>
-                        <span className="font-semibold">{paymentSuccessData.receiptNo}</span>
+                        <span className="font-semibold text-gray-900">{paymentSuccessData.receiptNo}</span>
                       </div>
-                      <div className="flex justify-between mb-2">
+                      <div className="flex justify-between border-b pb-2">
                         <span className="text-gray-500">Student:</span>
-                        <span className="font-semibold">{paymentSuccessData.student}</span>
+                        <span className="font-semibold text-gray-900">{paymentSuccessData.student}</span>
                       </div>
-                      <div className="flex justify-between mb-2">
+                      <div className="flex justify-between border-b pb-2">
                         <span className="text-gray-500">Class:</span>
-                        <span className="font-semibold">{paymentSuccessData.class}</span>
+                        <span className="font-semibold text-gray-900">{paymentSuccessData.class}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between border-b pb-2">
                         <span className="text-gray-500">Amount Paid:</span>
-                        <span className="font-semibold text-green-600">₹{paymentSuccessData.amount.toLocaleString()}</span>
+                        <span className="font-bold text-green-600">₹{paymentSuccessData.amount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-gray-500">Payment:</span>
+                        <span className="font-semibold text-gray-900">{paymentSuccessData.method}</span>
+                      </div>
+                      <div className="flex justify-between pt-1">
+                        <span className="text-gray-500">Remaining Due:</span>
+                        <span className="font-bold text-red-600">₹{paymentSuccessData.remainingDue.toLocaleString()}</span>
                       </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                       <button 
-                        onClick={() => { setShowPaymentModal(false); openReceiptModal(paymentSuccessData); setTimeout(handlePrint, 100); }}
-                        className="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:text-sm"
+                        onClick={() => { setShowPaymentModal(false); openReceiptModal(paymentSuccessData); }}
+                        className="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm"
+                      >
+                        <Eye className="mr-2 h-4 w-4" /> View Receipt
+                      </button>
+                      <button 
+                        onClick={() => { setShowPaymentModal(false); handlePrintReceipt(paymentSuccessData); }}
+                        className="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:text-sm"
                       >
                         <Printer className="mr-2 h-4 w-4" /> Print Receipt
                       </button>
                       <button 
-                        onClick={() => { setShowPaymentModal(false); openReceiptModal(paymentSuccessData); }}
-                        className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm"
-                      >
-                        View Receipt
-                      </button>
-                      <button 
                         onClick={() => setShowPaymentModal(false)}
-                        className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm"
+                        className="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:text-sm"
                       >
                         Close
                       </button>
@@ -634,6 +667,11 @@ export default function Accounts() {
                                     <span className="text-gray-900">Current Due:</span>
                                     <span className="text-red-600">₹{selectedPayStudent.pendingFee.toLocaleString()}</span>
                                   </div>
+                                  {selectedPayStudent.pendingFee === 0 && (
+                                    <div className="mt-2 bg-green-100 text-green-800 text-xs font-bold p-2 rounded text-center">
+                                      No outstanding balance
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -659,7 +697,8 @@ export default function Accounts() {
                                   type="number" 
                                   value={payAmount}
                                   onChange={(e) => setPayAmount(e.target.value)}
-                                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" 
+                                  disabled={selectedPayStudent && selectedPayStudent.pendingFee === 0}
+                                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm disabled:bg-gray-100" 
                                   placeholder="0" 
                                 />
                               </div>
@@ -682,6 +721,8 @@ export default function Accounts() {
                               <label className="block text-sm font-medium text-gray-700">Remarks</label>
                               <input 
                                 type="text" 
+                                value={paymentRemarks}
+                                onChange={(e) => setPaymentRemarks(e.target.value)}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                                 placeholder="Optional reference no or note"
                               />
@@ -698,8 +739,12 @@ export default function Accounts() {
                       </div>
                     </div>
                     <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                      <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                        Confirm Payment
+                      <button 
+                        type="submit" 
+                        disabled={isSubmitting || (selectedPayStudent && selectedPayStudent.pendingFee === 0)}
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                      >
+                        {isSubmitting ? 'Recording...' : 'Confirm Payment'}
                       </button>
                       <button type="button" onClick={() => setShowPaymentModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                         Cancel
@@ -881,10 +926,28 @@ export default function Accounts() {
                       <span className="text-gray-500">Payment Mode:</span>
                       <span className="font-medium text-gray-900">{selectedReceipt.method}</span>
                     </div>
-                    <div className="flex justify-between pt-2">
+                    {selectedReceipt.remarks && (
+                      <div className="flex justify-between pb-3 border-b border-gray-100">
+                        <span className="text-gray-500">Remarks:</span>
+                        <span className="font-medium text-gray-900 italic">{selectedReceipt.remarks}</span>
+                      </div>
+                    )}
+                    {selectedReceipt.previousDue !== undefined && (
+                      <div className="flex justify-between pt-2 pb-2">
+                        <span className="text-gray-500 font-medium">Previous Due:</span>
+                        <span className="font-medium text-gray-900">₹{selectedReceipt.previousDue.toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className={`flex justify-between ${selectedReceipt.previousDue === undefined ? 'pt-2' : ''}`}>
                       <span className="text-base font-bold text-gray-900">Amount Paid:</span>
                       <span className="text-base font-bold text-green-600">₹{selectedReceipt.amount.toLocaleString()}</span>
                     </div>
+                    {selectedReceipt.remainingDue !== undefined && (
+                      <div className="flex justify-between pt-2 border-t border-gray-100 mt-2">
+                        <span className="text-gray-500 font-medium">Remaining Due:</span>
+                        <span className="font-medium text-red-600">₹{selectedReceipt.remainingDue.toLocaleString()}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -930,10 +993,28 @@ export default function Accounts() {
                 <div className="text-gray-600 font-medium">Payment Mode:</div>
                 <div className="col-span-2 font-medium">{selectedReceipt.method}</div>
               </div>
-              <div className="grid grid-cols-3 pt-6 border-t border-gray-300 items-center">
+              {selectedReceipt.remarks && (
+                <div className="grid grid-cols-3">
+                  <div className="text-gray-600 font-medium">Remarks:</div>
+                  <div className="col-span-2 font-medium italic">{selectedReceipt.remarks}</div>
+                </div>
+              )}
+              {selectedReceipt.previousDue !== undefined && (
+                <div className="grid grid-cols-3 pt-6 border-t border-gray-300">
+                  <div className="text-gray-600 font-medium">Previous Due:</div>
+                  <div className="col-span-2 font-medium">₹ {selectedReceipt.previousDue.toLocaleString()}</div>
+                </div>
+              )}
+              <div className={`grid grid-cols-3 items-center ${selectedReceipt.previousDue === undefined ? 'pt-6 border-t border-gray-300' : ''}`}>
                 <div className="text-gray-600 font-bold text-xl">Amount Paid:</div>
-                <div className="col-span-2 font-bold text-2xl">₹ {selectedReceipt.amount.toLocaleString()}/-</div>
+                <div className="col-span-2 font-bold text-2xl text-green-700">₹ {selectedReceipt.amount.toLocaleString()}/-</div>
               </div>
+              {selectedReceipt.remainingDue !== undefined && (
+                <div className="grid grid-cols-3 pb-2 border-b border-gray-300">
+                  <div className="text-gray-600 font-medium">Remaining Due:</div>
+                  <div className="col-span-2 font-medium text-red-600">₹ {selectedReceipt.remainingDue.toLocaleString()}</div>
+                </div>
+              )}
             </div>
 
             <div className="mt-20 flex justify-between">

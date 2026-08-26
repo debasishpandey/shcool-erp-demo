@@ -134,21 +134,26 @@ export const MockDataProvider = ({ children }) => {
     addActivity(`Admission converted to student`);
   };
 
-  const recordFeePayment = (studentId, amount, method, remarks) => {
+  const recordFeePayment = (studentId, amount, method, feeType, remarks) => {
     const student = data.students.find(s => s.id === studentId);
     if (!student) return null;
 
+    const remainingDue = Math.max(0, student.pendingFee - amount);
+
     const exactTxn = {
       id: `TXN-${Date.now()}`,
-      receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      receiptNo: `REC-2026-${Math.floor(100 + Math.random() * 900)}`,
       student: student.name,
       studentId: student.id,
       admissionNo: student.admissionNo,
       class: `${student.class}-${student.section}`,
       amount: amount,
       method: method,
-      feeType: remarks || "Tuition Fee",
-      date: new Date().toISOString().split('T')[0],
+      feeType: feeType || "Tuition Fee",
+      remarks: remarks || "",
+      previousDue: student.pendingFee,
+      remainingDue: remainingDue,
+      date: "2026-08-26",
       status: "Successful"
     };
 
