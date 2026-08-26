@@ -1,0 +1,201 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import * as initialMockData from '../data/mockData';
+
+const MockDataContext = createContext();
+
+export const useMockData = () => useContext(MockDataContext);
+
+export const MockDataProvider = ({ children }) => {
+  // Try to load from localStorage first
+  const loadInitialState = () => {
+    const saved = localStorage.getItem('schoolERPDemoData');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse local storage data", e);
+      }
+    }
+    
+    // Fallback to initial mock data
+    return {
+      students: initialMockData.students,
+      teachers: initialMockData.teachers,
+      classes: initialMockData.classes,
+      feeTransactions: initialMockData.feeTransactions,
+      exams: initialMockData.exams,
+      notices: initialMockData.notices,
+      dashboardStats: initialMockData.dashboardStats,
+      admissions: [
+        { id: "ENQ-001", studentName: "Rohan Khanna", parentName: "Vivek Khanna", phone: "9876543111", appliedClass: "Class X", date: "2026-08-20", status: "New" },
+        { id: "ENQ-002", studentName: "Sara Ali", parentName: "Ahmed Ali", phone: "9876543222", appliedClass: "Class VIII", date: "2026-08-21", status: "Application" },
+        { id: "ENQ-003", studentName: "Arjun Nair", parentName: "Rahul Nair", phone: "9876543333", appliedClass: "Class IX", date: "2026-08-22", status: "Approved" }
+      ],
+      homework: [
+        { id: "HW-001", subject: "Mathematics", class: "Class X", title: "Chapter 4 — Algebra", assignedDate: "2026-08-22", dueDate: "2026-08-25", assigned: 120, submitted: 95, pending: 25 },
+        { id: "HW-002", subject: "Science", class: "Class VIII", title: "Photosynthesis Diagram", assignedDate: "2026-08-23", dueDate: "2026-08-26", assigned: 150, submitted: 80, pending: 70 }
+      ],
+      activities: [
+        { id: 1, text: "System initialized", time: "Just now" }
+      ],
+      documents: []
+    };
+  };
+
+  const [data, setData] = useState(loadInitialState);
+
+  // Persist to local storage on every change
+  useEffect(() => {
+    localStorage.setItem('schoolERPDemoData', JSON.stringify(data));
+  }, [data]);
+
+  // Actions
+  const resetDemoData = () => {
+    localStorage.removeItem('schoolERPDemoData');
+    setData(loadInitialState());
+  };
+
+  const addActivity = (text) => {
+    setData(prev => ({
+      ...prev,
+      activities: [{ id: Date.now(), text, time: "Just now" }, ...prev.activities].slice(0, 15) // Keep last 15
+    }));
+  };
+
+  const addAdmission = (enquiry) => {
+    const newEnquiry = { ...enquiry, id: `ENQ-${Date.now()}`, date: new Date().toISOString().split('T')[0], status: "New" };
+    setData(prev => ({ ...prev, admissions: [newEnquiry, ...prev.admissions] }));
+    addActivity(`New admission enquiry for ${enquiry.studentName}`);
+  };
+
+  const convertAdmissionToStudent = (enquiryId, classSection, rollNo) => {
+    setData(prev => {
+      const admission = prev.admissions.find(a => a.id === enquiryId);
+      if (!admission) return prev;
+
+      // Update admission status
+      const updatedAdmissions = prev.admissions.map(a => 
+        a.id === enquiryId ? { ...a, status: "Admitted" } : a
+      );
+
+      // Create new student
+      const newStudent = {
+        id: Date.now(),
+        name: admission.studentName,
+        admissionNo: `ADM-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+        class: admission.appliedClass.replace("Class ", ""),
+        section: classSection || "A",
+        parent: admission.parentName,
+        phone: admission.phone,
+        attendance: "100%",
+        feeStatus: "Pending",
+        status: "Active",
+        gender: "Not specified",
+        dob: "2010-01-01",
+        bg: "O+",
+        rollNo: rollNo || Math.floor(Math.random() * 50) + 1,
+        address: "Address not provided",
+        parentEmail: "",
+        totalFee: 45000,
+        paidFee: 0,
+        pendingFee: 45000
+      };
+
+      // Update dashboard stats
+      const updatedStats = { ...prev.dashboardStats, students: prev.dashboardStats.students + 1 };
+
+      return {
+        ...prev,
+        admissions: updatedAdmissions,
+        students: [newStudent, ...prev.students],
+        dashboardStats: updatedStats
+      };
+    });
+    addActivity(`Admission converted to student`);
+  };
+
+  const recordFeePayment = (studentId, amount, method, remarks) => {
+    setData(prev => {
+      const studentIndex = prev.students.findIndex(s => s.id === studentId);
+      if (studentIndex === -1) return prev;
+
+      const student = prev.students[studentIndex];
+      const newPaid = student.paidFee + amount;
+      const newPending = student.totalFee - newPaid;
+      
+      let newFeeStatus = "Pending";
+      if (newPending <= 0) newFeeStatus = "Paid";
+      else if (student.feeStatus === "Overdue") newFeeStatus = "Overdue";
+
+      const updatedStudent = {
+        ...student,
+        paidFee: newPaid,
+        pendingFee: Math.max(0, newPending),
+        feeStatus: newFeeStatus
+      };
+
+      const newStudents = [...prev.students];
+      newStudents[studentIndex] = updatedStudent;
+
+      const newTxn = {
+        id: `TXN-${Date.now()}`,
+        receiptNo: `REC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+        student: student.name,
+        class: `${student.class}-${student.section}`,
+        amount: amount,
+        method: method,
+        date: new Date().toISOString().split('T')[0],
+        status: "Successful"
+      };
+
+      return {
+        ...prev,
+        students: newStudents,
+        feeTransactions: [newTxn, ...prev.feeTransactions]
+      };
+    });
+    addActivity(`₹${amount} fee payment recorded`);
+  };
+
+  const markAttendance = (studentId, status) => {
+    // For demo purposes, we will just log the activity if they are marked absent
+    if (status === 'Absent' || status === 'Late') {
+      setData(prev => {
+        const student = prev.students.find(s => s.id === studentId);
+        if (student) {
+          addActivity(`${student.name} was marked ${status.toLowerCase()}`);
+        }
+        return prev;
+      });
+    }
+  };
+
+  const addNotice = (notice) => {
+    const newNotice = { ...notice, id: Date.now(), date: new Date().toISOString().split('T')[0] };
+    setData(prev => ({ ...prev, notices: [newNotice, ...prev.notices] }));
+    addActivity(`Notice published: ${notice.title}`);
+  };
+
+  const addHomework = (hw) => {
+    const newHw = { ...hw, id: `HW-${Date.now()}`, assignedDate: new Date().toISOString().split('T')[0], assigned: Math.floor(Math.random() * 40) + 30, submitted: 0, pending: 0 };
+    newHw.pending = newHw.assigned;
+    setData(prev => ({ ...prev, homework: [newHw, ...prev.homework] }));
+    addActivity(`Homework assigned to ${hw.class}`);
+  };
+
+  return (
+    <MockDataContext.Provider value={{ 
+      data, 
+      resetDemoData,
+      addAdmission,
+      convertAdmissionToStudent,
+      recordFeePayment,
+      markAttendance,
+      addNotice,
+      addHomework,
+      addActivity
+    }}>
+      {children}
+    </MockDataContext.Provider>
+  );
+};

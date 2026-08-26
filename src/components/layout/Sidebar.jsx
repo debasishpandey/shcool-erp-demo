@@ -1,26 +1,65 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, BookOpen, UserCheck, 
   CreditCard, FileText, Award, Calendar, 
   Bell, MessageSquare, BarChart2, Settings,
-  LogOut
+  LogOut, ClipboardList, FolderOpen, UserPlus, MonitorSmartphone
 } from 'lucide-react';
 import clsx from 'clsx';
 
-const navItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'Students', path: '/students', icon: Users },
-  { name: 'Teachers', path: '/teachers', icon: BookOpen },
-  { name: 'Classes', path: '/classes', icon: BookOpen },
-  { name: 'Attendance', path: '/attendance', icon: UserCheck },
-  { name: 'Fees', path: '/fees', icon: CreditCard },
-  { name: 'Examinations', path: '/exams', icon: FileText },
-  { name: 'Results', path: '/results', icon: Award },
-  { name: 'Timetable', path: '/timetable', icon: Calendar },
-  { name: 'Notices', path: '/notices', icon: Bell },
-  { name: 'Communication', path: '/communication', icon: MessageSquare },
-  { name: 'Reports', path: '/reports', icon: BarChart2 },
-  { name: 'Settings', path: '/settings', icon: Settings },
+const navGroups = [
+  {
+    title: "DASHBOARD",
+    items: [
+      { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }
+    ]
+  },
+  {
+    title: "ACADEMIC",
+    items: [
+      { name: 'Students', path: '/students', icon: Users },
+      { name: 'Admissions', path: '/admissions', icon: UserPlus },
+      { name: 'Teachers', path: '/teachers', icon: BookOpen },
+      { name: 'Classes', path: '/classes', icon: BookOpen },
+      { name: 'Attendance', path: '/attendance', icon: UserCheck },
+      { name: 'Timetable', path: '/timetable', icon: Calendar },
+      { name: 'Homework', path: '/homework', icon: ClipboardList },
+      { name: 'Examinations', path: '/exams', icon: FileText },
+      { name: 'Results', path: '/results', icon: Award },
+    ]
+  },
+  {
+    title: "FINANCE",
+    items: [
+      { name: 'Fees', path: '/fees', icon: CreditCard },
+      { name: 'Reports', path: '/reports', icon: BarChart2 },
+    ]
+  },
+  {
+    title: "COMMUNICATION",
+    items: [
+      { name: 'Notices', path: '/notices', icon: Bell },
+      { name: 'Communication', path: '/communication', icon: MessageSquare },
+    ]
+  },
+  {
+    title: "RECORDS",
+    items: [
+      { name: 'Documents', path: '/documents', icon: FolderOpen },
+    ]
+  },
+  {
+    title: "PORTAL",
+    items: [
+      { name: 'Parent Portal', path: '/parent/dashboard', icon: MonitorSmartphone },
+    ]
+  },
+  {
+    title: "SETTINGS",
+    items: [
+      { name: 'Settings', path: '/settings', icon: Settings },
+    ]
+  }
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }) {
@@ -43,23 +82,32 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           </svg>
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto py-4">
-        <nav className="space-y-1 px-3">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              onClick={() => setIsOpen(false)}
-              className={({ isActive }) => clsx(
-                "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                isActive 
-                  ? "bg-primary-50 text-primary-700" 
-                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-              )}
-            >
-              <item.icon className={clsx("mr-3 h-5 w-5 flex-shrink-0")} />
-              {item.name}
-            </NavLink>
+      <div className="flex-1 overflow-y-auto py-4 sidebar-scroll">
+        <nav className="space-y-4 px-3">
+          {navGroups.map((group, idx) => (
+            <div key={idx}>
+              <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                {group.title}
+              </p>
+              <div className="space-y-1">
+                {group.items.map((item) => (
+                  <NavLink
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive }) => clsx(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      isActive 
+                        ? "bg-primary-50 text-primary-700" 
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    )}
+                  >
+                    <item.icon className={clsx("mr-3 h-5 w-5 flex-shrink-0")} />
+                    {item.name}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
       </div>
@@ -76,9 +124,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               <p className="text-xs font-medium text-gray-500">Administrator</p>
             </div>
           </div>
-          <button className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-md hover:bg-red-50 hidden lg:block" title="Logout">
+          <Link to="/login" className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-md hover:bg-red-50 hidden lg:block" title="Logout">
             <LogOut className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,13 +1,21 @@
 import { useState } from 'react';
-import { feeTransactions, students } from '../data/mockData';
+import { useMockData } from '../context/MockDataContext';
 import { CreditCard, Search, Filter, Plus, FileText, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 
 export default function Fees() {
+  const { data, recordFeePayment } = useMockData();
+  const { feeTransactions, students } = data;
+
   const [showModal, setShowModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState('transactions'); // 'transactions' or 'dues'
   const [dueClassFilter, setDueClassFilter] = useState('All Classes');
   const [feeStatusFilter, setFeeStatusFilter] = useState('All Fee Statuses');
+
+  // Form state
+  const [studentId, setStudentId] = useState('');
+  const [amount, setAmount] = useState('');
+  const [method, setMethod] = useState('Cash');
 
   const filteredStudents = students.filter(s => {
     const matchClass = dueClassFilter === 'All Classes' || s.class === dueClassFilter;
@@ -17,9 +25,27 @@ export default function Fees() {
 
   const handlePayment = (e) => {
     e.preventDefault();
-    setShowModal(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    if (studentId && amount) {
+      // Find the student ID from admission number or just use ID directly if we had a proper select.
+      // For demo, we just find the student by admissionNo or Name
+      const student = students.find(s => s.admissionNo === studentId || s.name.toLowerCase().includes(studentId.toLowerCase()));
+      if (student) {
+        recordFeePayment(student.id, parseInt(amount), method, "Fees dashboard payment");
+        setShowModal(false);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        setStudentId('');
+        setAmount('');
+      } else {
+        alert("Student not found!");
+      }
+    }
+  };
+
+  const openCollectModal = (student) => {
+    setStudentId(student.admissionNo);
+    setAmount(student.pendingFee.toString());
+    setShowModal(true);
   };
 
   return (
@@ -136,7 +162,7 @@ export default function Fees() {
                       <div className="text-sm text-gray-500">Class {txn.class}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                      ₹{txn.amount}
+                      ₹{txn.amount.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 flex items-center gap-1">
@@ -153,7 +179,7 @@ export default function Fees() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button className="text-primary-600 hover:text-primary-900 flex items-center gap-1 justify-end w-full">
-                        <FileText className="w-4 h-4" /> View
+                        <FileText className="w-4 h-4" /> Receipt
                       </button>
                     </td>
                   </tr>
@@ -239,7 +265,7 @@ export default function Fees() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         {student.pendingFee > 0 ? (
                           <button 
-                            onClick={() => setShowModal(true)}
+                            onClick={() => openCollectModal(student)}
                             className="text-primary-600 hover:text-primary-900 flex items-center gap-1 justify-end w-full"
                           >
                             <Plus className="w-4 h-4" /> Collect
@@ -271,47 +297,67 @@ export default function Fees() {
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowModal(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <CreditCard className="h-6 w-6 text-primary-600" />
-                  </div>
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">Record Payment</h3>
-                    <div className="mt-4 space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Student Admission No.</label>
-                        <input type="text" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="e.g. ADM-2026-001" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Amount Paid (₹)</label>
-                        <input type="number" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="0.00" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Payment Method</label>
-                        <select className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
-                          <option>Cash</option>
-                          <option>Cheque</option>
-                          <option>Online Transfer</option>
-                          <option>Card</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Remarks</label>
-                        <textarea rows="2" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"></textarea>
+              <form onSubmit={handlePayment}>
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 sm:mx-0 sm:h-10 sm:w-10">
+                      <CreditCard className="h-6 w-6 text-primary-600" />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">Record Payment</h3>
+                      <div className="mt-4 space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Student Admission No. or Name</label>
+                          <input 
+                            required
+                            type="text" 
+                            value={studentId}
+                            onChange={(e) => setStudentId(e.target.value)}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" 
+                            placeholder="e.g. ADM-2026-001 or Priya" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Amount Paid (₹)</label>
+                          <input 
+                            required
+                            type="number" 
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" 
+                            placeholder="0.00" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Payment Method</label>
+                          <select 
+                            value={method}
+                            onChange={(e) => setMethod(e.target.value)}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                          >
+                            <option>Cash</option>
+                            <option>Cheque</option>
+                            <option>Online Transfer</option>
+                            <option>Card</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Remarks</label>
+                          <textarea rows="2" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"></textarea>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onClick={handlePayment} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                  Record Payment
-                </button>
-                <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cancel
-                </button>
-              </div>
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    Record Payment
+                  </button>
+                  <button type="button" onClick={() => setShowModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

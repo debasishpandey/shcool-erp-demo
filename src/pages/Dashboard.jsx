@@ -1,5 +1,5 @@
-import { Users, BookOpen, CreditCard, UserCheck, TrendingUp, TrendingDown, FileText, Bell } from 'lucide-react';
-import { dashboardStats } from '../data/mockData';
+import { Users, BookOpen, CreditCard, UserCheck, TrendingUp, TrendingDown, FileText, Bell, Bus, Calendar } from 'lucide-react';
+import { useMockData } from '../context/MockDataContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const attendanceData = [
@@ -20,6 +20,9 @@ const feeData = [
 ];
 
 export default function Dashboard() {
+  const { data } = useMockData();
+  const { dashboardStats, activities } = data;
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
@@ -53,6 +56,48 @@ export default function Dashboard() {
             </dd>
           </div>
         ))}
+      </div>
+
+      {/* Today's Operations */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Today's Operations</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="border-l-4 border-blue-500 pl-4">
+            <div className="flex items-center gap-2 mb-1">
+              <UserCheck className="w-4 h-4 text-gray-400" />
+              <p className="text-sm font-medium text-gray-500">Attendance</p>
+            </div>
+            <p className="text-lg font-bold text-gray-900">1,084 / 1,142 <span className="text-sm font-normal text-gray-500">Present</span></p>
+            <p className="text-sm font-medium text-red-500 mt-1">58 Absent</p>
+          </div>
+          
+          <div className="border-l-4 border-green-500 pl-4">
+            <div className="flex items-center gap-2 mb-1">
+              <CreditCard className="w-4 h-4 text-gray-400" />
+              <p className="text-sm font-medium text-gray-500">Fees</p>
+            </div>
+            <p className="text-lg font-bold text-gray-900">₹42,500 <span className="text-sm font-normal text-gray-500">collected</span></p>
+            <p className="text-sm font-medium text-amber-500 mt-1">₹18,200 pending today</p>
+          </div>
+          
+          <div className="border-l-4 border-purple-500 pl-4">
+            <div className="flex items-center gap-2 mb-1">
+              <FileText className="w-4 h-4 text-gray-400" />
+              <p className="text-sm font-medium text-gray-500">Examinations</p>
+            </div>
+            <p className="text-lg font-bold text-gray-900">Class X Mathematics</p>
+            <p className="text-sm font-medium text-blue-500 mt-1">Tomorrow</p>
+          </div>
+          
+          <div className="border-l-4 border-amber-500 pl-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Bus className="w-4 h-4 text-gray-400" />
+              <p className="text-sm font-medium text-gray-500">Transport</p>
+            </div>
+            <p className="text-lg font-bold text-gray-900">18 buses <span className="text-sm font-normal text-gray-500">active</span></p>
+            <p className="text-sm font-medium text-red-500 mt-1">2 delayed</p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -117,39 +162,43 @@ export default function Dashboard() {
 
       {/* Recent Activity */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-5 border-b border-gray-100">
+        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-medium leading-6 text-gray-900">Recent Activity</h3>
+          <span className="text-sm text-primary-600 font-medium cursor-pointer">View all</span>
         </div>
         <ul className="divide-y divide-gray-100">
-          {[
-            { id: 1, content: "Rahul Sharma's fee payment was recorded", time: "10 mins ago", type: 'fee' },
-            { id: 2, content: "Priya Das was marked absent", time: "1 hour ago", type: 'attendance' },
-            { id: 3, content: "New student admitted to Class VIII-A", time: "3 hours ago", type: 'student' },
-            { id: 4, content: "Exam results published for Class X", time: "5 hours ago", type: 'exam' },
-            { id: 5, content: "New notice published: Independence Day", time: "1 day ago", type: 'notice' },
-          ].map((activity) => (
-            <li key={activity.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-4">
-                <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                  activity.type === 'fee' ? 'bg-green-100 text-green-600' :
-                  activity.type === 'attendance' ? 'bg-red-100 text-red-600' :
-                  activity.type === 'student' ? 'bg-blue-100 text-blue-600' :
-                  activity.type === 'exam' ? 'bg-purple-100 text-purple-600' :
-                  'bg-amber-100 text-amber-600'
-                }`}>
-                  {activity.type === 'fee' ? <CreditCard size={18} /> : 
-                   activity.type === 'attendance' ? <UserCheck size={18} /> : 
-                   activity.type === 'student' ? <Users size={18} /> : 
-                   activity.type === 'exam' ? <FileText size={18} /> : 
-                   <Bell size={18} />}
+          {activities.length > 0 ? activities.slice(0, 5).map((activity) => {
+            const isFee = activity.text.toLowerCase().includes('fee');
+            const isAtt = activity.text.toLowerCase().includes('absent') || activity.text.toLowerCase().includes('attendance');
+            const isStu = activity.text.toLowerCase().includes('student') || activity.text.toLowerCase().includes('admission');
+            const isHw = activity.text.toLowerCase().includes('homework');
+            
+            return (
+              <li key={activity.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center space-x-4">
+                  <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
+                    isFee ? 'bg-green-100 text-green-600' :
+                    isAtt ? 'bg-red-100 text-red-600' :
+                    isStu ? 'bg-blue-100 text-blue-600' :
+                    isHw ? 'bg-purple-100 text-purple-600' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {isFee ? <CreditCard size={18} /> : 
+                     isAtt ? <UserCheck size={18} /> : 
+                     isStu ? <Users size={18} /> : 
+                     isHw ? <BookOpen size={18} /> : 
+                     <Bell size={18} />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{activity.text}</p>
+                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{activity.content}</p>
-                  <p className="text-sm text-gray-500 truncate">{activity.time}</p>
-                </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          }) : (
+            <li className="px-6 py-8 text-center text-sm text-gray-500">No recent activity</li>
+          )}
         </ul>
       </div>
     </div>

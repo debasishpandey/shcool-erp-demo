@@ -1,7 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
+import ParentLayout from './components/layout/ParentLayout';
 import Marketing from './pages/Marketing';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Admissions from './pages/Admissions';
 import Students from './pages/Students';
 import StudentProfile from './pages/StudentProfile';
 import Teachers from './pages/Teachers';
@@ -15,28 +18,43 @@ import Notices from './pages/Notices';
 import Communication from './pages/Communication';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import Homework from './pages/Homework';
+import Documents from './pages/Documents';
+import ParentDashboard from './pages/parent/ParentDashboard';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Marketing />} />
+        <Route path="/login" element={<Login />} />
         
+        {/* Admin/Staff Routes */}
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admissions" element={<Admissions />} />
           <Route path="/students" element={<Students />} />
           <Route path="/students/:id" element={<StudentProfile />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/homework" element={<Homework />} />
           <Route path="/fees" element={<Fees />} />
           <Route path="/exams" element={<Examinations />} />
           <Route path="/results" element={<Results />} />
           <Route path="/timetable" element={<Timetable />} />
           <Route path="/notices" element={<Notices />} />
           <Route path="/communication" element={<Communication />} />
+          <Route path="/documents" element={<Documents />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+        </Route>
+
+        {/* Parent Portal Routes */}
+        <Route element={<ParentLayout />}>
+          <Route path="/parent/dashboard" element={<ParentDashboard />} />
+          <Route path="/parent/fees" element={<div className="p-8 text-center text-gray-500">Fees module coming soon to parent portal</div>} />
+          <Route path="/parent/homework" element={<div className="p-8 text-center text-gray-500">Homework module coming soon to parent portal</div>} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />

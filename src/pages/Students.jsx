@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { students } from '../data/mockData';
+import { useMockData } from '../context/MockDataContext';
 import { Search, Filter, Plus, Download, ChevronRight } from 'lucide-react';
 
 export default function Students() {
   const navigate = useNavigate();
+  const { data } = useMockData();
+  const { students } = data;
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
 
