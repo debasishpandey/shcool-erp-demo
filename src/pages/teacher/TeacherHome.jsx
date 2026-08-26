@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Users, BookOpen, AlertCircle, ChevronRight, CheckCircle2, Bell, MessageSquare, Calendar } from 'lucide-react';
-import { teacherProfile, todaysTeaching, summaryStats, notificationsList, parentSuggestionsList, eventsList } from '../../data/teacherMockData';
+import { Users, BookOpen, AlertCircle, ChevronRight, CheckCircle2, Bell, MessageSquare, Calendar, GraduationCap, Edit3, FileText } from 'lucide-react';
+import { teacherProfile, todaysTeaching, summaryStats, notificationsList, parentSuggestionsList, eventsList, latestExam, examResultsVIII_A } from '../../data/teacherMockData';
 
 export default function TeacherHome() {
   const navigate = useNavigate();
@@ -8,6 +8,8 @@ export default function TeacherHome() {
   const unreadNotifs = notificationsList.filter(n => n.unread).length;
   const newSuggestions = parentSuggestionsList.filter(s => s.status === 'New').length;
   const upcomingEvents = eventsList.slice(0, 2);
+  
+  const classAverage = Math.round(examResultsVIII_A.reduce((acc, curr) => acc + curr.percentage, 0) / examResultsVIII_A.length);
 
   return (
     <div className="p-4 space-y-6">
@@ -155,6 +157,41 @@ export default function TeacherHome() {
           <div className="bg-white rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center col-span-1">
             <span className="text-xl font-bold text-orange-600">{summaryStats.concernsOpen}</span>
             <span className="text-[10px] text-gray-500 font-bold mt-1 leading-tight">Concerns</span>
+          </div>
+        </div>
+      </section>
+
+      {/* LATEST EXAM */}
+      <section>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Latest Exam</h2>
+          <button onClick={() => navigate('/teacher/exams')} className="text-xs font-bold text-primary-600">Open</button>
+        </div>
+        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+              <GraduationCap size={16} />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 text-sm leading-tight">{latestExam.name}</h3>
+              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">{latestExam.month}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            <button 
+              onClick={() => navigate('/teacher/exams/enter-marks')}
+              className="bg-blue-50 text-blue-700 py-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 hover:bg-blue-100"
+            >
+              <span className="flex items-center gap-1"><Edit3 size={14} /> Enter Marks</span>
+              <span className="text-[10px] text-blue-500 font-semibold">{latestExam.enteredMarks} / {latestExam.totalStudents}</span>
+            </button>
+            <button 
+              onClick={() => navigate('/teacher/exams/reports')}
+              className="bg-green-50 text-green-700 py-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 hover:bg-green-100"
+            >
+              <span className="flex items-center gap-1"><FileText size={14} /> Class Report</span>
+              <span className="text-[10px] text-green-600 font-semibold">{classAverage}% Avg</span>
+            </button>
           </div>
         </div>
       </section>

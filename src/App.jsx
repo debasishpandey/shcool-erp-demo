@@ -33,6 +33,9 @@ import TeacherConcerns from './pages/teacher/TeacherConcerns';
 import TeacherNotifications from './pages/teacher/TeacherNotifications';
 import TeacherEvents from './pages/teacher/TeacherEvents';
 import TeacherMore from './pages/teacher/TeacherMore';
+import TeacherExams from './pages/teacher/TeacherExams';
+import TeacherEnterMarks from './pages/teacher/TeacherEnterMarks';
+import TeacherClassReports from './pages/teacher/TeacherClassReports';
 
 function App() {
   return (
@@ -80,6 +83,9 @@ function App() {
           <Route path="/teacher/notifications" element={<TeacherNotifications />} />
           <Route path="/teacher/events" element={<TeacherEvents />} />
           <Route path="/teacher/more" element={<TeacherMore />} />
+          <Route path="/teacher/exams" element={<TeacherExams />} />
+          <Route path="/teacher/exams/enter-marks" element={<TeacherEnterMarks />} />
+          <Route path="/teacher/exams/reports" element={<TeacherClassReports />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />

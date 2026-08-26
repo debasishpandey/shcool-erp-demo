@@ -150,3 +150,72 @@ export const parentSuggestionsList = [
   { id: 3, author: 'Neha Patel', context: 'Parent of Ananya Patel', category: 'Academic', message: 'Please consider adding more revision worksheets before the monthly test.', date: '22 Aug 2026', status: 'Reviewed', anonymous: false },
   { id: 4, author: 'Anonymous Parent', context: '', category: 'Homework', message: 'Could the school provide a little more notice before holiday homework is assigned?', date: '20 Aug 2026', status: 'Reviewed', anonymous: true }
 ];
+
+export const latestExam = {
+  name: 'Unit Test 1',
+  month: 'August 2026',
+  totalStudents: 42,
+  enteredMarks: 38,
+  status: 'Marks Entry Open'
+};
+
+const getGrade = (percentage) => {
+  if (percentage >= 91) return 'A1';
+  if (percentage >= 81) return 'A2';
+  if (percentage >= 71) return 'B1';
+  if (percentage >= 61) return 'B2';
+  if (percentage >= 51) return 'C1';
+  if (percentage >= 41) return 'C2';
+  if (percentage >= 33) return 'D';
+  return 'E';
+};
+
+const generateExamResults = () => {
+  // Use the 15 hardcoded students and generate the remaining 27 to make 42 total
+  const allStudents = [...studentsVIII_A];
+  
+  for (let i = 16; i <= 42; i++) {
+    allStudents.push({
+      rollNo: i.toString().padStart(2, '0'),
+      name: `Student ${i}`,
+      attendance: 75 + (i % 20),
+      concerns: i % 10 === 0 ? 1 : 0,
+      homeworkPending: i % 5,
+      subjects: { Math: true, Science: true, English: true, SST: true, Hindi: true }
+    });
+  }
+
+  const results = allStudents.map((student, idx) => {
+    // Generate deterministic marks based on index
+    // Give top students high marks, some average, some needing attention
+    const baseScore = 60 + (idx % 30); 
+    const math = Math.min(100, Math.max(0, baseScore + (idx % 7) - 3));
+    const science = Math.min(100, Math.max(0, baseScore + (idx % 11) - 5));
+    const english = Math.min(100, Math.max(0, baseScore + (idx % 13) - 6));
+    const sst = Math.min(100, Math.max(0, baseScore + (idx % 17) - 8));
+    const hindi = Math.min(100, Math.max(0, baseScore + (idx % 5) - 2));
+
+    const total = math + science + english + sst + hindi;
+    const percentage = Math.round((total / 500) * 100);
+    const grade = getGrade(percentage);
+
+    return {
+      ...student,
+      marks: {
+        Mathematics: math,
+        Science: science,
+        English: english,
+        'Social Science': sst,
+        Hindi: hindi
+      },
+      total,
+      percentage,
+      grade
+    };
+  });
+
+  return results;
+};
+
+export const examResultsVIII_A = generateExamResults();
+

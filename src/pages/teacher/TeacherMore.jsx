@@ -1,4 +1,4 @@
-import { User, Calendar, Bell, MessageSquare, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
+import { User, Calendar, Bell, MessageSquare, HelpCircle, LogOut, ChevronRight, GraduationCap } from 'lucide-react';
 import { teacherProfile } from '../../data/teacherMockData';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ export default function TeacherMore() {
     { icon: <Calendar size={20} />, label: 'Events & Holidays', action: () => navigate('/teacher/events') },
     { icon: <Bell size={20} />, label: 'Notifications', action: () => navigate('/teacher/notifications') },
     { icon: <MessageSquare size={20} />, label: 'Parent Suggestions', action: () => navigate('/teacher/concerns') },
+    { icon: <GraduationCap size={20} />, label: 'Exam & Results', action: () => navigate('/teacher/exams') },
     { icon: <HelpCircle size={20} />, label: 'Help & Support', action: () => alert('Help demo') },
   ];
 
