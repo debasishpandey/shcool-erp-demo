@@ -18,6 +18,16 @@ export default function StaffAdjustments() {
     adjusted: adjustments.filter(a => a.status === 'Adjusted').length,
   };
 
+  const periodTimes = {
+    1: "08:00 – 08:45",
+    2: "08:45 – 09:30",
+    3: "09:30 – 10:15",
+    4: "10:15 – 11:00",
+    5: "11:30 – 12:15",
+    6: "12:15 – 13:00",
+    7: "13:30 – 14:15",
+  };
+
   const getSuggestedTeachers = (adjustment, targetPeriod) => {
     const periodToUse = adjustment ? adjustment.period : targetPeriod;
     
@@ -34,13 +44,14 @@ export default function StaffAdjustments() {
       let recommendationType = 'Backup option';
       let isFree = false;
       let isSameSubject = false;
-      let currentAssignment = 'Free / No class';
+      let currentAssignment = '';
       
       const scheduleEntry = t.todaySchedule.find(s => s.period === periodToUse);
       if (scheduleEntry) {
         if (scheduleEntry.type === 'free' || !scheduleEntry.class) {
           isFree = true;
           score += 50;
+          currentAssignment = 'FREE';
         } else {
           // If they have a class, they can only be a backup if it's not the affected class
           if (adjustment && scheduleEntry.class === adjustment.class) {
@@ -49,9 +60,10 @@ export default function StaffAdjustments() {
           currentAssignment = `${scheduleEntry.class} — ${scheduleEntry.subject}`;
         }
       } else {
-        // Assume free if no explicit schedule blocks them, but give lower confidence
-        isFree = true;
-        score += 30;
+        // Unknown, not explicitly free
+        isFree = false;
+        score += 10;
+        currentAssignment = 'Unknown / No data';
       }
 
       if (adjustment && t.subjects.includes(adjustment.subject)) {
@@ -75,6 +87,7 @@ export default function StaffAdjustments() {
     })
     .filter(Boolean)
     .sort((a, b) => b.score - a.score);
+
   };
 
   const handleAssignClick = (adj) => {
@@ -223,24 +236,26 @@ export default function StaffAdjustments() {
               
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl leading-6 font-bold text-gray-900">Suggested Teachers</h3>
+                  <h3 className="text-xl leading-6 font-bold text-gray-900">Find Replacement Teacher</h3>
                   <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-gray-500">
                     <UserX className="w-6 h-6" />
                   </button>
                 </div>
                 
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 flex justify-between items-center">
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
                   <div>
-                    <p className="text-sm text-gray-500">Class & Period</p>
-                    <p className="font-bold text-lg text-gray-900">{selectedAdjustment.class} • Period {selectedAdjustment.period}</p>
+                    <p className="text-sm text-gray-500">Class</p>
+                    <p className="font-bold text-lg text-gray-900">{selectedAdjustment.class}</p>
                   </div>
-                  <ArrowRight className="w-6 h-6 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-500">Period {selectedAdjustment.period}</p>
+                    <p className="font-bold text-lg text-gray-900">{periodTimes[selectedAdjustment.period]}</p>
+                  </div>
                   <div>
                     <p className="text-sm text-gray-500">Subject</p>
                     <p className="font-bold text-lg text-gray-900">{selectedAdjustment.subject}</p>
                   </div>
-                  <ArrowRight className="w-6 h-6 text-gray-400" />
-                  <div className="text-right">
+                  <div>
                     <p className="text-sm text-gray-500">Absent Teacher</p>
                     <p className="font-bold text-lg text-gray-900 text-red-600">{selectedAdjustment.originalTeacher}</p>
                   </div>
@@ -269,17 +284,19 @@ export default function StaffAdjustments() {
                             {isTopMatch && <span className="px-2 py-0.5 bg-primary-100 text-primary-800 text-xs font-bold rounded-full uppercase tracking-wider">Recommended</span>}
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                            <p className="text-gray-600"><span className="text-gray-400">Dept:</span> {teacher.department}</p>
-                            <p className="text-gray-600"><span className="text-gray-400">Subject:</span> {teacher.subjects.join(', ')}</p>
+                          <div className="grid grid-cols-1 gap-y-2 text-sm">
+                            <p className="text-gray-600"><span className="text-gray-400">Subject(s):</span> {teacher.subjects.join(', ')}</p>
                             
-                            <p className={`flex items-center gap-1 font-medium mt-1 ${teacher.isFree ? 'text-green-600' : 'text-gray-600'}`}>
-                              {teacher.isFree ? <CheckCircle2 className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
-                              Status: {teacher.isFree ? `Free in Period ${selectedAdjustment.period}` : 'Active'}
-                            </p>
-                            <p className="text-gray-500 mt-1 truncate" title={teacher.currentAssignment}>
-                              <span className="text-gray-400">Current P{selectedAdjustment.period}:</span> {teacher.currentAssignment}
-                            </p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 bg-gray-50 p-2.5 rounded border border-gray-200">
+                              <p className="text-gray-700 font-medium flex items-center gap-1.5">
+                                <Clock className="w-4 h-4 text-gray-500" />
+                                Period {selectedAdjustment.period}: {periodTimes[selectedAdjustment.period]}
+                              </p>
+                              <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
+                              <p className={`font-semibold flex items-center gap-1.5 ${teacher.isFree ? 'text-green-600' : 'text-gray-600'}`}>
+                                Current Schedule: {teacher.currentAssignment}
+                              </p>
+                            </div>
                           </div>
                         </div>
                         
@@ -334,7 +351,7 @@ export default function StaffAdjustments() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Period:</span>
-                    <span className="font-semibold text-gray-900">{selectedAdjustment.period}</span>
+                    <span className="font-semibold text-gray-900">{selectedAdjustment.period} ({periodTimes[selectedAdjustment.period]})</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-500">Subject:</span>
