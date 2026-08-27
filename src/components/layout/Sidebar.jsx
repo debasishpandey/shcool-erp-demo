@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, BookOpen, UserCheck, 
   CreditCard, FileText, Award, Calendar, 
   Bell, MessageSquare, BarChart2, Settings,
-  LogOut, ClipboardList, FolderOpen, UserPlus, MonitorSmartphone
+  LogOut, ClipboardList, FolderOpen, UserPlus, MonitorSmartphone, Truck
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -27,12 +27,14 @@ const navGroups = [
       { name: 'Homework', path: '/homework', icon: ClipboardList },
       { name: 'Examinations', path: '/exams', icon: FileText },
       { name: 'Results', path: '/results', icon: Award },
+      { name: 'Syllabus', path: '/syllabus', icon: BookOpen },
     ]
   },
   {
     title: "OPERATIONS",
     items: [
       { name: 'Staff Adjustments', path: '/staff-adjustments', icon: UserCheck },
+      { name: 'Transport', path: '/transport', icon: Truck },
     ]
   },
   {

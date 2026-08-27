@@ -52,7 +52,7 @@ export const teachers = [
     todaySchedule: [
       { period: 1, time: "08:00 - 08:45", class: "V-A", subject: "Mathematics", type: "class" },
       { period: 2, time: "08:45 - 09:30", class: "", subject: "", type: "free" },
-      { period: 3, time: "09:30 - 10:15", class: "VIII-B", subject: "Mathematics", type: "class" },
+      { period: 3, time: "09:30 - 10:15", class: "", subject: "", type: "free" },
       { period: 4, time: "10:15 - 11:00", class: "V-A", subject: "Mathematics", type: "class" },
       { period: 5, time: "11:30 - 12:15", class: "", subject: "", type: "free" },
     ]
@@ -61,7 +61,8 @@ export const teachers = [
     todaySchedule: [
       { period: 1, time: "08:00 - 08:45", class: "IX-A", subject: "English", type: "class" },
       { period: 2, time: "08:45 - 09:30", class: "", subject: "", type: "free" },
-      { period: 3, time: "09:30 - 10:15", class: "VIII-A", subject: "English", type: "class" },
+      { period: 3, time: "09:30 - 10:15", class: "", subject: "", type: "free" },
+      { period: 4, time: "10:15 - 11:00", class: "VIII-A", subject: "English", type: "class" },
       { period: 5, time: "11:30 - 12:15", class: "", subject: "", type: "free" },
     ]
   },

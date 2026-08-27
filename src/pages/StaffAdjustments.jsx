@@ -28,29 +28,17 @@ export default function StaffAdjustments() {
     7: "13:30 – 14:15",
   };
 
-  const demoCandidates = [
-    {
-      id: "EMP-034", 
-      name: "Amit Das", 
-      subjects: ["Mathematics"],
-      isTopMatch: true,
-      badgeText: "Recommended — Same Subject"
-    },
-    {
-      id: "EMP-041", 
-      name: "Neha Patel", 
-      subjects: ["English"],
-      isTopMatch: false,
-      badgeText: "Available"
-    },
-    {
-      id: "EMP-012", 
-      name: "Ravi Shankar", 
-      subjects: ["Science", "Physics"],
-      isTopMatch: false,
-      badgeText: "Available"
-    }
-  ];
+  const getAvailableTeachers = (period, adjustment) => {
+    return mockTeachers
+      .filter(teacher => teacher.status === 'Active')
+      .filter(teacher => teacher.name !== adjustment?.originalTeacher)
+      .filter(teacher => {
+        const slot = teacher.todaySchedule?.find(
+          schedule => Number(schedule.period) === Number(period)
+        );
+        return slot?.type === 'free';
+      });
+  };
 
   const handleAssignClick = (adj) => {
     setSelectedAdjustment(adj);
@@ -75,8 +63,33 @@ export default function StaffAdjustments() {
     setSelectedTeacher(null);
   };
 
-  const suggestedForModal = demoCandidates;
-  const widgetTeachers = demoCandidates;
+  const getSuggestedForModal = (adjustment) => {
+    const candidates = getAvailableTeachers(adjustment.period, adjustment);
+
+    return candidates
+      .map(teacher => ({
+        ...teacher,
+        isSameSubject: teacher.subjects?.includes(adjustment.subject)
+      }))
+      .sort((a, b) => {
+        if (a.isSameSubject && !b.isSameSubject) return -1;
+        if (!a.isSameSubject && b.isSameSubject) return 1;
+        return 0;
+      })
+      .map((teacher, index) => ({
+        ...teacher,
+        isTopMatch: index === 0,
+        badgeText:
+          index === 0 && teacher.isSameSubject
+            ? 'Recommended — Same Subject'
+            : index === 0
+              ? 'Recommended Available'
+              : 'Available'
+      }));
+  };
+
+  const suggestedForModal = selectedAdjustment ? getSuggestedForModal(selectedAdjustment) : [];
+  const widgetTeachers = getAvailableTeachers(widgetPeriod, null);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -237,11 +250,11 @@ export default function StaffAdjustments() {
                       <div key={teacher.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white border ${teacher.isTopMatch ? 'border-primary-500 shadow-md ring-1 ring-primary-500' : 'border-gray-200'} rounded-lg hover:border-primary-300 transition-all gap-4`}>
                         <div className="flex-1">
                           <p className={`font-bold text-lg ${teacher.isTopMatch ? 'text-primary-700' : 'text-gray-900'}`}>{teacher.name}</p>
-                          
                           <div className="grid grid-cols-1 gap-y-1 text-sm mt-1">
                             <p className="text-gray-600">{teacher.subjects.join(', ')}</p>
-                            <p className="text-gray-600">Period {selectedAdjustment.period} • {periodTimes[selectedAdjustment.period]}</p>
-                            <p className="font-semibold text-green-600">Status: FREE</p>
+                            <p className="text-gray-600">Period {selectedAdjustment.period}</p>
+                            <p className="text-gray-600">{periodTimes[selectedAdjustment.period]}</p>
+                            <p className="font-semibold text-green-600">● FREE</p>
                           </div>
                         </div>
                         

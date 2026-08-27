@@ -24,6 +24,9 @@ import Homework from './pages/Homework';
 import Documents from './pages/Documents';
 import RecordPayment from './pages/RecordPayment';
 import StaffAdjustments from './pages/StaffAdjustments';
+import Syllabus from './pages/Syllabus';
+import Transport from './pages/Transport';
+import TransportDetail from './pages/TransportDetail';
 import StudentReports from './pages/StudentReports';
 import ParentDashboard from './pages/parent/ParentDashboard';
 import ParentAcademics from './pages/parent/ParentAcademics';
@@ -84,6 +87,9 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/student-reports" element={<StudentReports />} />
           <Route path="/staff-adjustments" element={<StaffAdjustments />} />
+          <Route path="/syllabus" element={<Syllabus />} />
+          <Route path="/transport" element={<Transport />} />
+          <Route path="/transport/:busId" element={<TransportDetail />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 
