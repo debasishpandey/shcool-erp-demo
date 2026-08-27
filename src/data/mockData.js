@@ -54,6 +54,7 @@ export const teachers = [
       { period: 2, time: "08:45 - 09:30", class: "", subject: "", type: "free" },
       { period: 3, time: "09:30 - 10:15", class: "VIII-B", subject: "Mathematics", type: "class" },
       { period: 4, time: "10:15 - 11:00", class: "V-A", subject: "Mathematics", type: "class" },
+      { period: 5, time: "11:30 - 12:15", class: "", subject: "", type: "free" },
     ]
   },
   { id: "EMP-041", name: "Neha Patel", department: "English", subjects: ["English"], isClassTeacher: true, classTeacherOf: "IX-A", teachingClasses: ["VIII-A", "IX-A"], contact: "9876500041", email: "neha.patel@sunriseschool.edu", status: "Active", todayStatus: "Present",
@@ -61,6 +62,7 @@ export const teachers = [
       { period: 1, time: "08:00 - 08:45", class: "IX-A", subject: "English", type: "class" },
       { period: 2, time: "08:45 - 09:30", class: "", subject: "", type: "free" },
       { period: 3, time: "09:30 - 10:15", class: "VIII-A", subject: "English", type: "class" },
+      { period: 5, time: "11:30 - 12:15", class: "", subject: "", type: "free" },
     ]
   },
   { id: "EMP-012", name: "Ravi Shankar", department: "Science", subjects: ["Science", "Physics"], isClassTeacher: true, classTeacherOf: "X-A", teachingClasses: ["VIII-A", "IX-B", "X-A"], contact: "9876500001", email: "ravi.s@sunriseschool.edu", status: "Active", todayStatus: "Present",
@@ -68,11 +70,20 @@ export const teachers = [
       { period: 1, time: "08:00 - 08:45", class: "", subject: "", type: "free" },
       { period: 2, time: "08:45 - 09:30", class: "", subject: "", type: "free" },
       { period: 3, time: "09:30 - 10:15", class: "VIII-A", subject: "Science", type: "class" },
+      { period: 5, time: "11:30 - 12:15", class: "IX-B", subject: "Physics", type: "class" },
     ]
   },
   { id: "EMP-055", name: "Meenakshi Iyer", department: "Social Science", subjects: ["History", "Civics"], isClassTeacher: false, classTeacherOf: "", teachingClasses: ["VII-A", "VIII-A"], contact: "9876500004", email: "meenakshi@sunriseschool.edu", status: "Absent", todayStatus: "Absent Today",
     todaySchedule: []
   },
+  { id: "EMP-062", name: "Kiran Rao", department: "Science", subjects: ["Biology"], isClassTeacher: false, classTeacherOf: "", teachingClasses: ["IX-A", "X-B"], contact: "9876500062", email: "kiran@sunriseschool.edu", status: "Active", todayStatus: "Present",
+    todaySchedule: [
+      { period: 1, time: "08:00 - 08:45", class: "IX-A", subject: "Biology", type: "class" },
+      { period: 2, time: "08:45 - 09:30", class: "X-B", subject: "Biology", type: "class" },
+      { period: 3, time: "09:30 - 10:15", class: "", subject: "", type: "free" },
+      { period: 5, time: "11:30 - 12:15", class: "", subject: "", type: "free" },
+    ]
+  }
 ];
 
 export const classes = [
