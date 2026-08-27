@@ -28,40 +28,29 @@ export default function StaffAdjustments() {
     7: "13:30 – 14:15",
   };
 
-  const demoTeacherAvailability = {
-    1: ['EMP-034', 'EMP-041'],
-    2: ['EMP-034', 'EMP-041', 'EMP-012'],
-    3: ['EMP-012', 'EMP-034'],
-    4: ['EMP-041', 'EMP-034'],
-    5: ['EMP-012', 'EMP-041']
-  };
-
-  const getAvailableTeachersForPeriod = (period, adjustment) => {
-    const ids = demoTeacherAvailability[period] || [];
-    let candidates = ids
-      .map(id => mockTeachers.find(t => t.id === id))
-      .filter(Boolean);
-
-    // Exclude absent teachers
-    candidates = candidates.filter(t => t.status !== 'Absent' && t.todayStatus !== 'Absent Today');
-    
-    if (adjustment) {
-      // Exclude original teacher
-      candidates = candidates.filter(t => t.name !== adjustment.originalTeacher);
-      
-      // Sort same-subject first
-      return candidates.map(t => {
-        const isSameSubject = t.subjects.includes(adjustment.subject);
-        return {
-          ...t,
-          isSameSubject,
-          score: isSameSubject ? 100 : 0
-        };
-      }).sort((a, b) => b.score - a.score);
+  const demoCandidates = [
+    {
+      id: "EMP-034", 
+      name: "Amit Das", 
+      subjects: ["Mathematics"],
+      isTopMatch: true,
+      badgeText: "Recommended — Same Subject"
+    },
+    {
+      id: "EMP-041", 
+      name: "Neha Patel", 
+      subjects: ["English"],
+      isTopMatch: false,
+      badgeText: "Available"
+    },
+    {
+      id: "EMP-012", 
+      name: "Ravi Shankar", 
+      subjects: ["Science", "Physics"],
+      isTopMatch: false,
+      badgeText: "Available"
     }
-    
-    return candidates;
-  };
+  ];
 
   const handleAssignClick = (adj) => {
     setSelectedAdjustment(adj);
@@ -86,8 +75,8 @@ export default function StaffAdjustments() {
     setSelectedTeacher(null);
   };
 
-  const suggestedForModal = selectedAdjustment ? getAvailableTeachersForPeriod(selectedAdjustment.period, selectedAdjustment) : [];
-  const widgetTeachers = getAvailableTeachersForPeriod(widgetPeriod);
+  const suggestedForModal = demoCandidates;
+  const widgetTeachers = demoCandidates;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -244,41 +233,37 @@ export default function StaffAdjustments() {
                       <button onClick={() => setShowAssignModal(false)} className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50">Close</button>
                     </div>
                   ) : (
-                    suggestedForModal.map((teacher, index) => {
-                      const isTopMatch = index === 0 && teacher.isSameSubject;
-                      
-                      return (
-                        <div key={teacher.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white border ${isTopMatch ? 'border-primary-500 shadow-md ring-1 ring-primary-500' : 'border-gray-200'} rounded-lg hover:border-primary-300 transition-all gap-4`}>
-                          <div className="flex-1">
-                            <p className={`font-bold text-lg ${isTopMatch ? 'text-primary-700' : 'text-gray-900'}`}>{teacher.name}</p>
-                            
-                            <div className="grid grid-cols-1 gap-y-1 text-sm mt-1">
-                              <p className="text-gray-600">{teacher.subjects.join(', ')}</p>
-                              <p className="text-gray-600">Period {selectedAdjustment.period} • {periodTimes[selectedAdjustment.period]}</p>
-                              <p className="font-semibold text-green-600">Status: FREE</p>
-                            </div>
-                          </div>
+                    suggestedForModal.map((teacher) => (
+                      <div key={teacher.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white border ${teacher.isTopMatch ? 'border-primary-500 shadow-md ring-1 ring-primary-500' : 'border-gray-200'} rounded-lg hover:border-primary-300 transition-all gap-4`}>
+                        <div className="flex-1">
+                          <p className={`font-bold text-lg ${teacher.isTopMatch ? 'text-primary-700' : 'text-gray-900'}`}>{teacher.name}</p>
                           
-                          <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
-                            {isTopMatch ? (
-                              <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 uppercase flex items-center gap-1">
-                                <Star className="w-3 h-3 fill-amber-500" /> Recommended — Same Subject
-                              </span>
-                            ) : (
-                              <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-green-100 text-green-800">
-                                Available
-                              </span>
-                            )}
-                            <button
-                              onClick={() => handleAssignInit(teacher)}
-                              className="w-full sm:w-auto px-6 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-                            >
-                              Assign
-                            </button>
+                          <div className="grid grid-cols-1 gap-y-1 text-sm mt-1">
+                            <p className="text-gray-600">{teacher.subjects.join(', ')}</p>
+                            <p className="text-gray-600">Period {selectedAdjustment.period} • {periodTimes[selectedAdjustment.period]}</p>
+                            <p className="font-semibold text-green-600">Status: FREE</p>
                           </div>
                         </div>
-                      )
-                    })
+                        
+                        <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                          {teacher.isTopMatch ? (
+                            <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 uppercase flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-amber-500" /> {teacher.badgeText}
+                            </span>
+                          ) : (
+                            <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-green-100 text-green-800">
+                              {teacher.badgeText}
+                            </span>
+                          )}
+                          <button
+                            onClick={() => handleAssignInit(teacher)}
+                            className="w-full sm:w-auto px-6 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+                          >
+                            Assign
+                          </button>
+                        </div>
+                      </div>
+                    ))
                   )}
                 </div>
               </div>
