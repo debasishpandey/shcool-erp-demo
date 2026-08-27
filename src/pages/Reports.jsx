@@ -1,45 +1,111 @@
-import { BarChart2, Download, FileText, PieChart, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { BookOpen, Users, UserCheck, DollarSign, Activity, FileText, Calendar, Bell, ChevronRight, BarChart2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Reports() {
   const role = localStorage.getItem('demoUserRole') || 'admin';
-  
-  const allReports = [
-    { title: 'Student Attendance Report', desc: 'Detailed attendance records by class and section.', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50', forAccountant: false },
-    { title: 'Fee Collection Report', desc: 'Daily, monthly, and yearly fee collection summaries.', icon: BarChart2, color: 'text-green-600', bg: 'bg-green-50', forAccountant: true },
-    { title: 'Academic Performance', desc: 'Class-wise result analysis and comparative charts.', icon: PieChart, color: 'text-purple-600', bg: 'bg-purple-50', forAccountant: false },
-    { title: 'Teacher Attendance', desc: 'Staff attendance and leave records.', icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50', forAccountant: false },
-    { title: 'Defaulter List', desc: 'List of students with pending fee dues over 30 days.', icon: FileText, color: 'text-red-600', bg: 'bg-red-50', forAccountant: true },
+
+  if (role !== 'admin' && role !== 'accountant') {
+    return (
+      <div className="max-w-7xl mx-auto flex items-center justify-center h-64">
+        <p className="text-gray-500 text-lg">You do not have permission to view reports.</p>
+      </div>
+    );
+  }
+
+  const reportGroups = [
+    {
+      title: "Students",
+      icon: Users,
+      color: "blue",
+      reports: [
+        { name: "Student Directory", desc: "Complete list with filters", to: "/student-reports" },
+        { name: "Attendance Analytics", desc: "Class-wise and threshold reports", to: "/attendance" },
+        { name: "Admission Sources", desc: "Where students come from", to: "/student-reports" },
+      ]
+    },
+    {
+      title: "Staff",
+      icon: UserCheck,
+      color: "green",
+      reports: [
+        { name: "Staff Directory", desc: "Teacher and non-teaching list", to: "/teachers" },
+        { name: "Staff Attendance", desc: "Daily punches and working hours", to: "/teachers" },
+        { name: "Teaching Load", desc: "Periods assigned per teacher", to: "/teachers" },
+        { name: "Class Teacher Assignments", desc: "View all class teachers", to: "/classes" },
+      ]
+    },
+    {
+      title: "Academics",
+      icon: BookOpen,
+      color: "purple",
+      reports: [
+        { name: "Exam Performance", desc: "Class and subject averages", to: "/results" },
+        { name: "Top Performers", desc: "Rankings across classes", to: "/results" },
+        { name: "Needs Attention", desc: "Students below academic targets", to: "/results" },
+      ]
+    },
+    {
+      title: "Finance",
+      icon: DollarSign,
+      color: "emerald",
+      reports: [
+        { name: "Fee Collection", desc: "YTD and daily collection", to: "/accounts" },
+        { name: "Outstanding Dues", desc: "Pending fees by class", to: "/accounts" },
+        { name: "Defaulters List", desc: "Overdue payments over 30 days", to: "/accounts" },
+        { name: "Expense Summary", desc: "Categorized expenses", to: "/expenses" },
+      ]
+    },
+    {
+      title: "Operations",
+      icon: Activity,
+      color: "orange",
+      reports: [
+        { name: "Class Adjustments", desc: "Teacher substitution history", to: "/staff-adjustments" },
+        { name: "Teacher Availability", desc: "Free slots across the week", to: "/timetable" },
+        { name: "Active Schedule", desc: "Currently running classes", to: "/timetable" },
+      ]
+    }
   ];
 
-  const reports = allReports.filter(r => role === 'admin' || (role === 'accountant' && r.forAccountant));
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-        <p className="mt-1 text-sm text-gray-500">Generate and download comprehensive school reports.</p>
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Principal Reports Hub</h1>
+          <p className="mt-1 text-md text-gray-500">Access all analytics and management reports from one place.</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {reports.map((report, idx) => (
-          <div key={idx} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-            <div className="p-6">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${report.bg} ${report.color}`}>
-                <report.icon className="w-6 h-6" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {reportGroups.map((group, idx) => {
+          const Icon = group.icon;
+          return (
+            <div key={idx} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className={`p-4 border-b border-gray-200 bg-gray-50 flex items-center gap-3`}>
+                <div className={`p-2 rounded-lg bg-${group.color}-100 text-${group.color}-600`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">{group.title}</h2>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{report.title}</h3>
-              <p className="text-gray-500 text-sm">{report.desc}</p>
+              <ul className="divide-y divide-gray-100">
+                {group.reports.map((report, i) => (
+                  <li key={i}>
+                    <Link to={report.to} className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                          <BarChart2 className="w-4 h-4 text-gray-400" /> {report.name}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1 ml-6">{report.desc}</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
-              <button className="text-sm font-medium text-gray-700 hover:text-primary-600 flex items-center gap-2">
-                Generate <ChevronRight className="w-4 h-4" />
-              </button>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Download className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

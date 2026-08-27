@@ -19,6 +19,7 @@ const navGroups = [
     items: [
       { name: 'Students', path: '/students', icon: Users },
       { name: 'Admissions', path: '/admissions', icon: UserPlus },
+      { name: 'Student Reports', path: '/student-reports', icon: BarChart2 },
       { name: 'Teachers', path: '/teachers', icon: BookOpen },
       { name: 'Classes', path: '/classes', icon: BookOpen },
       { name: 'Attendance', path: '/attendance', icon: UserCheck },
@@ -26,6 +27,12 @@ const navGroups = [
       { name: 'Homework', path: '/homework', icon: ClipboardList },
       { name: 'Examinations', path: '/exams', icon: FileText },
       { name: 'Results', path: '/results', icon: Award },
+    ]
+  },
+  {
+    title: "OPERATIONS",
+    items: [
+      { name: 'Staff Adjustments', path: '/staff-adjustments', icon: UserCheck },
     ]
   },
   {

@@ -1,6 +1,7 @@
-import { Users, BookOpen, CreditCard, UserCheck, TrendingUp, TrendingDown, FileText, Bell, Bus, Calendar } from 'lucide-react';
+import { Users, BookOpen, CreditCard, UserCheck, TrendingUp, TrendingDown, FileText, Bell, Bus, Calendar, AlertCircle, Clock, ChevronRight } from 'lucide-react';
 import { useMockData } from '../context/MockDataContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Link } from 'react-router-dom';
 
 const attendanceData = [
   { name: 'Mon', attendance: 92 },
@@ -21,111 +22,141 @@ const feeData = [
 
 export default function Dashboard() {
   const { data } = useMockData();
-  const { dashboardStats, activities } = data;
+  // Ensure we fall back to defaults if data is not fully loaded
+  const dashboardStats = data?.dashboardStats || { students: 1142, teachers: 68, classes: 32, attendance: 94.9, feesCollectedToday: 47500, pendingFees: 320000 };
+  const todayStatus = data?.todayStatus || { studentsPresent: 1084, studentsTotal: 1142, teachersPresent: 61, teachersTotal: 68, teachersAbsent: 7, classesRunning: 30, classesTotal: 32, examsToday: 2, homeworkPending: 128, noticesUnread: 3 };
+  const activities = data?.activities || [];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Good morning, Admin 👋</h1>
-        <p className="mt-1 text-sm text-gray-500">Here's what's happening in your school today.</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { name: 'Total Students', stat: dashboardStats.students, icon: Users, change: '+4.7%', changeType: 'increase' },
-          { name: 'Total Teachers', stat: dashboardStats.teachers, icon: BookOpen, change: '+1.2%', changeType: 'increase' },
-          { name: 'Total Classes', stat: dashboardStats.classes, icon: BookOpen, change: '0%', changeType: 'neutral' },
-          { name: 'Avg Attendance', stat: `${dashboardStats.attendance}%`, icon: UserCheck, change: '-1.1%', changeType: 'decrease' },
-        ].map((item) => (
-          <div key={item.name} className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow-sm rounded-xl border border-gray-100 overflow-hidden">
-            <dt>
-              <div className="absolute bg-primary-50 rounded-lg p-3">
-                <item.icon className="h-6 w-6 text-primary-600" aria-hidden="true" />
-              </div>
-              <p className="ml-16 text-sm font-medium text-gray-500 truncate">{item.name}</p>
-            </dt>
-            <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
-              <p className="text-2xl font-semibold text-gray-900">{item.stat}</p>
-              <p className={`ml-2 flex items-baseline text-sm font-semibold ${
-                item.changeType === 'increase' ? 'text-green-600' : item.changeType === 'decrease' ? 'text-red-600' : 'text-gray-500'
-              }`}>
-                {item.changeType === 'increase' ? <TrendingUp className="self-center flex-shrink-0 h-4 w-4 text-green-500 mr-1" /> : item.changeType === 'decrease' ? <TrendingDown className="self-center flex-shrink-0 h-4 w-4 text-red-500 mr-1" /> : null}
-                {item.change}
-              </p>
-            </dd>
-          </div>
-        ))}
-      </div>
-
-      {/* Today's Operations */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Today's Operations</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="border-l-4 border-blue-500 pl-4">
-            <div className="flex items-center gap-2 mb-1">
-              <UserCheck className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-500">Attendance</p>
-            </div>
-            <p className="text-lg font-bold text-gray-900">1,084 / 1,142 <span className="text-sm font-normal text-gray-500">Present</span></p>
-            <p className="text-sm font-medium text-red-500 mt-1">58 Absent</p>
-          </div>
-          
-          <div className="border-l-4 border-green-500 pl-4">
-            <div className="flex items-center gap-2 mb-1">
-              <CreditCard className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-500">Fees</p>
-            </div>
-            <p className="text-lg font-bold text-gray-900">₹42,500 <span className="text-sm font-normal text-gray-500">collected</span></p>
-            <p className="text-sm font-medium text-amber-500 mt-1">₹18,200 pending today</p>
-          </div>
-          
-          <div className="border-l-4 border-purple-500 pl-4">
-            <div className="flex items-center gap-2 mb-1">
-              <FileText className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-500">Examinations</p>
-            </div>
-            <p className="text-lg font-bold text-gray-900">Class X Mathematics</p>
-            <p className="text-sm font-medium text-blue-500 mt-1">Tomorrow</p>
-          </div>
-          
-          <div className="border-l-4 border-amber-500 pl-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Bus className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-500">Transport</p>
-            </div>
-            <p className="text-lg font-bold text-gray-900">18 buses <span className="text-sm font-normal text-gray-500">active</span></p>
-            <p className="text-sm font-medium text-red-500 mt-1">2 delayed</p>
-          </div>
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Good morning, Principal 👋</h1>
+          <p className="mt-1 text-md text-gray-500">Wednesday, 26 August 2026. Here is your school's operational snapshot for today.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Fee Collection (YTD)</p>
-            <p className="mt-2 text-3xl font-semibold text-gray-900">₹{dashboardStats.feeCollection}</p>
+      {/* 4. PRINCIPAL ACTION REQUIRED / NEEDS ATTENTION */}
+      <div className="bg-red-50 border border-red-100 rounded-xl p-6">
+        <h2 className="text-lg font-bold text-red-800 mb-4 flex items-center gap-2">
+          <AlertCircle className="w-5 h-5" />
+          Needs Your Attention
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div className="bg-white rounded-lg p-4 border-l-4 border-red-500 shadow-sm flex flex-col justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">🔴 3 Classes Need Teacher Adjustment</p>
+              <p className="text-sm text-gray-600 mt-1">Mathematics and Social Science teachers absent.</p>
+            </div>
+            <Link to="/staff-adjustments" className="mt-3 text-sm font-medium text-red-600 hover:text-red-700 flex items-center gap-1">
+              View Adjustment <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
-          <div className="bg-green-50 p-4 rounded-full">
-            <CreditCard className="h-8 w-8 text-green-600" />
+
+          <div className="bg-white rounded-lg p-4 border-l-4 border-orange-500 shadow-sm flex flex-col justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">🟠 12 Students Below 75% Attendance</p>
+              <p className="text-sm text-gray-600 mt-1">Class VIII and IX students below threshold.</p>
+            </div>
+            <Link to="/student-reports?filter=attendance" className="mt-3 text-sm font-medium text-orange-600 hover:text-orange-700 flex items-center gap-1">
+              View Students <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
+
+          <div className="bg-white rounded-lg p-4 border-l-4 border-amber-500 shadow-sm flex flex-col justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">🟠 ₹{dashboardStats.pendingFees / 100000}L Fee Pending</p>
+              <p className="text-sm text-gray-600 mt-1">Overdue from 45 students across classes.</p>
+            </div>
+            <Link to="/accounts" className="mt-3 text-sm font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1">
+              View Dues <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 border-l-4 border-blue-500 shadow-sm flex flex-col justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">🔵 4 Admissions Awaiting Approval</p>
+              <p className="text-sm text-gray-600 mt-1">New applications for Class XI Science.</p>
+            </div>
+            <Link to="/admissions" className="mt-3 text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
+              Review Admissions <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
+      </div>
+
+      {/* 2. TOP SUMMARY (Compact) */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Students</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{dashboardStats.students}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Teachers</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{dashboardStats.teachers}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Classes</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{dashboardStats.classes}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Today's Att.</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{dashboardStats.attendance}%</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Fees Today</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">₹{(dashboardStats.feesCollectedToday / 1000).toFixed(1)}k</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</p>
+          <p className="text-2xl font-bold text-red-600 mt-1">₹{(dashboardStats.pendingFees / 100000).toFixed(1)}L</p>
+        </div>
+      </div>
+
+      {/* 3. TODAY'S SCHOOL STATUS */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-primary-600" />
+          Today's School Status
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           <div>
-            <p className="text-sm font-medium text-gray-500">Pending Fees</p>
-            <p className="mt-2 text-3xl font-semibold text-gray-900">₹{dashboardStats.pendingFees}</p>
+            <p className="text-sm font-medium text-gray-500">Students Present</p>
+            <p className="text-xl font-bold text-gray-900 mt-1">{todayStatus.studentsPresent} <span className="text-sm font-normal text-gray-500">/ {todayStatus.studentsTotal}</span></p>
           </div>
-          <div className="bg-amber-50 p-4 rounded-full">
-            <CreditCard className="h-8 w-8 text-amber-600" />
+          <div>
+            <p className="text-sm font-medium text-gray-500">Teachers Present</p>
+            <p className="text-xl font-bold text-gray-900 mt-1">{todayStatus.teachersPresent} <span className="text-sm font-normal text-gray-500">/ {todayStatus.teachersTotal}</span></p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Teachers Absent</p>
+            <p className="text-xl font-bold text-red-600 mt-1">{todayStatus.teachersAbsent}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Classes Running</p>
+            <p className="text-xl font-bold text-gray-900 mt-1">{todayStatus.classesRunning} <span className="text-sm font-normal text-gray-500">/ {todayStatus.classesTotal}</span></p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Exams Today</p>
+            <p className="text-xl font-bold text-gray-900 mt-1">{todayStatus.examsToday}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">School Notices</p>
+            <p className="text-xl font-bold text-primary-600 mt-1">{todayStatus.noticesUnread} unread</p>
           </div>
         </div>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Attendance Overview (Last 7 Days)</h2>
-          <div className="h-72 w-full">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-medium text-gray-900">Attendance Overview (7 Days)</h2>
+            <Link to="/attendance" className="text-sm font-medium text-primary-600 hover:text-primary-700">Detailed Report</Link>
+          </div>
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={attendanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -136,7 +167,7 @@ export default function Dashboard() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} domain={[0, 100]} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} domain={[80, 100]} />
                 <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                 <Area type="monotone" dataKey="attendance" stroke="#2563eb" strokeWidth={2} fillOpacity={1} fill="url(#colorAtt)" />
               </AreaChart>
@@ -144,9 +175,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Fee Collection (in Lakhs)</h2>
-          <div className="h-72 w-full">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-medium text-gray-900">Fee Collection (in Lakhs)</h2>
+            <Link to="/reports" className="text-sm font-medium text-primary-600 hover:text-primary-700">Financial Reports</Link>
+          </div>
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={feeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -160,16 +194,15 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">Recent Activity</h3>
-          <span className="text-sm text-primary-600 font-medium cursor-pointer">View all</span>
+      {/* Recent Principal Activity */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">Recent Principal Activity</h3>
         </div>
         <ul className="divide-y divide-gray-100">
           {activities.length > 0 ? activities.slice(0, 5).map((activity) => {
-            const isFee = activity.text.toLowerCase().includes('fee');
-            const isAtt = activity.text.toLowerCase().includes('absent') || activity.text.toLowerCase().includes('attendance');
+            const isFee = activity.text.toLowerCase().includes('fee') || activity.text.toLowerCase().includes('payment');
+            const isAtt = activity.text.toLowerCase().includes('absent') || activity.text.toLowerCase().includes('attendance') || activity.text.toLowerCase().includes('adjustment');
             const isStu = activity.text.toLowerCase().includes('student') || activity.text.toLowerCase().includes('admission');
             const isHw = activity.text.toLowerCase().includes('homework');
             
