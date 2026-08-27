@@ -28,66 +28,39 @@ export default function StaffAdjustments() {
     7: "13:30 – 14:15",
   };
 
-  const getSuggestedTeachers = (adjustment, targetPeriod) => {
-    const periodToUse = adjustment ? adjustment.period : targetPeriod;
+  const demoTeacherAvailability = {
+    1: ['EMP-034', 'EMP-041'],
+    2: ['EMP-034', 'EMP-041', 'EMP-012'],
+    3: ['EMP-012', 'EMP-034'],
+    4: ['EMP-041', 'EMP-034'],
+    5: ['EMP-012', 'EMP-041']
+  };
+
+  const getAvailableTeachersForPeriod = (period, adjustment) => {
+    const ids = demoTeacherAvailability[period] || [];
+    let candidates = ids
+      .map(id => mockTeachers.find(t => t.id === id))
+      .filter(Boolean);
+
+    // Exclude absent teachers
+    candidates = candidates.filter(t => t.status !== 'Absent' && t.todayStatus !== 'Absent Today');
     
-    let candidates = mockTeachers.filter(t => {
-      // Exclude absent teachers entirely
-      if (t.status === 'Absent' || t.todayStatus === 'Absent Today') return false;
-      // Exclude the original teacher for this adjustment
-      if (adjustment && t.name === adjustment.originalTeacher) return false;
-      return true;
-    });
-
-    return candidates.map(t => {
-      let score = 0;
-      let recommendationType = 'Backup option';
-      let isFree = false;
-      let isSameSubject = false;
-      let currentAssignment = '';
+    if (adjustment) {
+      // Exclude original teacher
+      candidates = candidates.filter(t => t.name !== adjustment.originalTeacher);
       
-      const scheduleEntry = t.todaySchedule.find(s => s.period === periodToUse);
-      if (scheduleEntry) {
-        if (scheduleEntry.type === 'free' || !scheduleEntry.class) {
-          isFree = true;
-          score += 50;
-          currentAssignment = 'FREE';
-        } else {
-          // If they have a class, they can only be a backup if it's not the affected class
-          if (adjustment && scheduleEntry.class === adjustment.class) {
-             return null;
-          }
-          currentAssignment = `${scheduleEntry.class} — ${scheduleEntry.subject}`;
-        }
-      } else {
-        // Unknown, not explicitly free
-        isFree = false;
-        score += 10;
-        currentAssignment = 'Unknown / No data';
-      }
-
-      if (adjustment && t.subjects.includes(adjustment.subject)) {
-        isSameSubject = true;
-        score += 100;
-      }
-      
-      score += 20; // Base active score
-
-      if (isSameSubject && isFree) recommendationType = 'Preferred — Same Subject';
-      else if (isFree) recommendationType = 'Available';
-
-      return {
-        ...t,
-        score,
-        isFree,
-        isSameSubject,
-        recommendationType,
-        currentAssignment
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.score - a.score);
-
+      // Sort same-subject first
+      return candidates.map(t => {
+        const isSameSubject = t.subjects.includes(adjustment.subject);
+        return {
+          ...t,
+          isSameSubject,
+          score: isSameSubject ? 100 : 0
+        };
+      }).sort((a, b) => b.score - a.score);
+    }
+    
+    return candidates;
   };
 
   const handleAssignClick = (adj) => {
@@ -113,8 +86,8 @@ export default function StaffAdjustments() {
     setSelectedTeacher(null);
   };
 
-  const suggestedForModal = selectedAdjustment ? getSuggestedTeachers(selectedAdjustment) : [];
-  const widgetTeachers = getSuggestedTeachers(null, widgetPeriod).filter(t => t.isFree);
+  const suggestedForModal = selectedAdjustment ? getAvailableTeachersForPeriod(selectedAdjustment.period, selectedAdjustment) : [];
+  const widgetTeachers = getAvailableTeachersForPeriod(widgetPeriod);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -235,12 +208,13 @@ export default function StaffAdjustments() {
             <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
               
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-1">
                   <h3 className="text-xl leading-6 font-bold text-gray-900">Find Replacement Teacher</h3>
                   <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-gray-500">
                     <UserX className="w-6 h-6" />
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 mb-4">Availability shown for Period {selectedAdjustment.period} • {periodTimes[selectedAdjustment.period]}</p>
                 
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
                   <div>
@@ -262,61 +236,50 @@ export default function StaffAdjustments() {
                 </div>
 
                 <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                  {!suggestedForModal.some(t => t.isFree) && (
-                    <div className="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-lg flex gap-3">
-                      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="font-semibold text-sm">No teacher marked explicitly free</h4>
-                        <p className="text-sm mt-1 text-orange-700">These teachers are active but have no free class assigned for this period in the demo schedule. Showing possible backup teachers.</p>
-                      </div>
+                  {suggestedForModal.length === 0 ? (
+                    <div className="bg-gray-50 border border-gray-200 text-gray-700 p-6 rounded-lg text-center mt-4">
+                      <AlertCircle className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                      <h4 className="font-semibold text-md text-gray-900">No teacher available</h4>
+                      <p className="text-sm mt-1">No active teacher is available for this period.</p>
+                      <button onClick={() => setShowAssignModal(false)} className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50">Close</button>
                     </div>
-                  )}
-
-                  {suggestedForModal.map((teacher, index) => {
-                    const isTopMatch = index === 0 && teacher.isSameSubject && teacher.isFree;
-                    
-                    return (
-                      <div key={teacher.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white border ${isTopMatch ? 'border-primary-500 shadow-md ring-1 ring-primary-500' : 'border-gray-200'} rounded-lg hover:border-primary-300 transition-all gap-4`}>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            {isTopMatch && <Star className="w-4 h-4 text-amber-500 fill-amber-500" />}
+                  ) : (
+                    suggestedForModal.map((teacher, index) => {
+                      const isTopMatch = index === 0 && teacher.isSameSubject;
+                      
+                      return (
+                        <div key={teacher.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white border ${isTopMatch ? 'border-primary-500 shadow-md ring-1 ring-primary-500' : 'border-gray-200'} rounded-lg hover:border-primary-300 transition-all gap-4`}>
+                          <div className="flex-1">
                             <p className={`font-bold text-lg ${isTopMatch ? 'text-primary-700' : 'text-gray-900'}`}>{teacher.name}</p>
-                            {isTopMatch && <span className="px-2 py-0.5 bg-primary-100 text-primary-800 text-xs font-bold rounded-full uppercase tracking-wider">Recommended</span>}
-                          </div>
-                          
-                          <div className="grid grid-cols-1 gap-y-2 text-sm">
-                            <p className="text-gray-600"><span className="text-gray-400">Subject(s):</span> {teacher.subjects.join(', ')}</p>
                             
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 bg-gray-50 p-2.5 rounded border border-gray-200">
-                              <p className="text-gray-700 font-medium flex items-center gap-1.5">
-                                <Clock className="w-4 h-4 text-gray-500" />
-                                Period {selectedAdjustment.period}: {periodTimes[selectedAdjustment.period]}
-                              </p>
-                              <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
-                              <p className={`font-semibold flex items-center gap-1.5 ${teacher.isFree ? 'text-green-600' : 'text-gray-600'}`}>
-                                Current Schedule: {teacher.currentAssignment}
-                              </p>
+                            <div className="grid grid-cols-1 gap-y-1 text-sm mt-1">
+                              <p className="text-gray-600">{teacher.subjects.join(', ')}</p>
+                              <p className="text-gray-600">Period {selectedAdjustment.period} • {periodTimes[selectedAdjustment.period]}</p>
+                              <p className="font-semibold text-green-600">Status: FREE</p>
                             </div>
                           </div>
+                          
+                          <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                            {isTopMatch ? (
+                              <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 uppercase flex items-center gap-1">
+                                <Star className="w-3 h-3 fill-amber-500" /> Recommended — Same Subject
+                              </span>
+                            ) : (
+                              <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-green-100 text-green-800">
+                                Available
+                              </span>
+                            )}
+                            <button
+                              onClick={() => handleAssignInit(teacher)}
+                              className="w-full sm:w-auto px-6 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+                            >
+                              Assign
+                            </button>
+                          </div>
                         </div>
-                        
-                        <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-md w-fit
-                            ${teacher.recommendationType.includes('Preferred') ? 'bg-blue-100 text-blue-800' : 
-                              teacher.recommendationType === 'Available' ? 'bg-green-100 text-green-800' : 
-                              'bg-gray-100 text-gray-700'}`}>
-                            {teacher.recommendationType}
-                          </span>
-                          <button
-                            onClick={() => handleAssignInit(teacher)}
-                            className="w-full sm:w-auto px-6 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-                          >
-                            Assign
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })
+                  )}
                 </div>
               </div>
 
